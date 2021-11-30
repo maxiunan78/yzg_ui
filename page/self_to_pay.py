@@ -14,8 +14,6 @@ from common.params_handle import Params
 class SelfPay(page_base.Base):
     def __init__(self):
         super(SelfPay, self).__init__()
-        self.browser = self.get_browser()
         self_pay_url = custom.post_params(Params.URL, Params.SELF_PAY_PARAMS, Params.SELF_PAY)
-        self.browser.open_url(self_pay_url)
-
+        self.open_url(self_pay_url)
 
