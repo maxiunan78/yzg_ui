@@ -1,0 +1,16 @@
+'test':
+  'database':
+    'host': '47.97.35.19'
+    'port': 3306
+    'user': 'root'
+    'password': 'rain1q2w3e4r5t'
+  'UA': 'Mozilla/5.0 (Linux; Android 7.1.1; Nexus 6 Build/N6F26U) AppleWebKit/537.36
+      (KHTML, like Gecko) Chrome/75.0.3770.142 Mobile Safari/537.36
+       wechatdevtools/1.05.2110290 MicroMessenger/8.0.5 webview/1637315156379193 webdebugger
+        port/38472 token/d69dbe30a7e48dbb306c0a9f6d8f821e '
+  'mobileopion':
+      'deviceMetrics':
+          'width': 400
+          "hight": 830
+          "pixelRatio": 3.0
+  'datapath': 'test_data.yaml'

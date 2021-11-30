@@ -1,0 +1,7 @@
+#输入字典数据时 ：号后需空格
+'url': 'https://wx.test.youzhanguanjia.com'
+"stationid": '165481041'
+'hqid': '16548'
+'selftopay' : '/portal/selfPay/toSelfPay'
+'memberregister' : '/web/indexV9.2.html?version=V9.2#/memberRegister'
+'openid': 'o3Uia0XxRtKiO4g-3ryMKI1r4NIA'
