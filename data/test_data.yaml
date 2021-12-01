@@ -1,7 +1,17 @@
 #输入字典数据时 ：号后需空格
+# 初始的url 环境
 'url': 'https://wx.test.youzhanguanjia.com'
-"stationid": '165481041'
-'hqid': '16548'
+
+#接口路径
 'selftopay' : '/portal/selfPay/toSelfPay'
 'memberregister' : '/web/indexV9.2.html?version=V9.2#/memberRegister'
-'openid': 'o3Uia0XxRtKiO4g-3ryMKI1r4NIA'
+
+#get url中需要的参数
+#公用参数
+"stationId": '165481041'
+'hqId': '16548'
+'openId': 'o3Uia0XxRtKiO4g-3ryMKI1r4NIA'
+
+# self_to_pay 参数
+'sourceType': '1'
+

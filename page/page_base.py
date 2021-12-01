@@ -6,7 +6,6 @@
 @Author  ：穆崧
 @Date    ：创建时间：2021/11/29 
 """
-import time
 
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver import Keys
@@ -14,7 +13,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 
 from base import driver
-from common.params_handle import Params
 
 
 class Base(object):
@@ -23,7 +21,7 @@ class Base(object):
         self.implicitly_wait(5)
         self.switch_phone()
         self.max()
-        self.open_url(Params.URL)
+        # self.open_url(Params.URL)
 
     def get_browser(self):
         return self.browser
@@ -144,7 +142,6 @@ class Base(object):
         """
         隐形等待
         :param timeout: 等待时间
-
         """
         self.browser.driver.implicitly_wait(timeout)
 
@@ -154,3 +151,31 @@ class Base(object):
         :return: url
         """
         return self.browser.driver.current_url
+
+    def get_text(self, locator_type, element):
+        """
+        获取文本
+        :param locator_type: 元素类型
+        :param element: 元素
+        :return: 文本
+        """
+        return self.find_element(locator_type, element).text
+
+    def quit(self):
+        """
+        关闭浏览器
+        """
+        self.browser.quit()
+
+    def back(self):
+        """
+        返回
+        """
+        self.browser.back()
+
+    def forward(self):
+        """
+        前进
+        """
+        self.browser.forward()
+

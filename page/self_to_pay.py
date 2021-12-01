@@ -8,12 +8,10 @@
 """
 from page import page_base
 from common import custom
-from common.params_handle import Params
 
 
 class SelfPay(page_base.Base):
     def __init__(self):
         super(SelfPay, self).__init__()
-        self_pay_url = custom.post_params(Params.URL, Params.SELF_PAY_PARAMS, Params.SELF_PAY)
-        self.open_url(self_pay_url)
-
+        # self_pay_url = custom.post_params(Params.URL, Params.SELF_PAY_PARAMS, Params.SELF_PAY)
+        # self.open_url(self_pay_url)
