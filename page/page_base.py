@@ -12,16 +12,17 @@ from selenium.webdriver import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 
-from base import driver
+from base import driver, yaml_handle
 
 
 class Base(object):
     def __init__(self, browser=driver.chrome()):
         self.browser = browser
+
         self.implicitly_wait(5)
         self.switch_phone()
         self.max()
-        # self.open_url(Params.URL)
+        # self.open_url(yaml_handle.param_value('url'))
 
     def get_browser(self):
         return self.browser
@@ -33,7 +34,7 @@ class Base(object):
         :param poll_frequency: 间隔查询时间
         :return: driver
         """
-        return WebDriverWait(self.browser.driver, timeout, poll_frequency)
+        return WebDriverWait(self.browser, timeout, poll_frequency)
 
     def open_url(self, url, timeout=5):
         """
@@ -42,7 +43,7 @@ class Base(object):
         :param url: 网站
 
         """
-        self.browser.driver.get(url)
+        self.browser.get(url)
         try:
             self.explicit_wait(timeout, 0.5)
         except Exception as msg:
@@ -97,7 +98,7 @@ class Base(object):
         :param element:
         :return:
         """
-        return self.browser.driver.find_element(self.element_locator(locator_type, element)).is_displayed()
+        return self.browser.find_element(self.element_locator(locator_type, element)).is_displayed()
 
     def click(self, locator_type, element):
         """
@@ -112,14 +113,14 @@ class Base(object):
         """
         最大化窗口
         """
-        self.browser.driver.maximize_window()
+        self.browser.maximize_window()
 
     def min(self):
         """
         最小化窗口
 
         """
-        self.browser.driver.minimize_window()
+        self.browser.minimize_window()
 
     def send_keys(self, locator_type, element, *kwargs):
         """
@@ -143,14 +144,14 @@ class Base(object):
         隐形等待
         :param timeout: 等待时间
         """
-        self.browser.driver.implicitly_wait(timeout)
+        self.browser.implicitly_wait(timeout)
 
     def get_cur_url(self):
         """
         获取当前的url
         :return: url
         """
-        return self.browser.driver.current_url
+        return self.browser.current_url
 
     def get_text(self, locator_type, element):
         """
@@ -178,4 +179,3 @@ class Base(object):
         前进
         """
         self.browser.forward()
-
