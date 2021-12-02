@@ -8,6 +8,7 @@
 """
 import logging
 import os
+import sys
 import time
 
 base_path = os.path.dirname(os.path.dirname(__file__))
@@ -17,6 +18,8 @@ if not os.path.exists(log_path):
 
 
 class Logger:
+    func = None
+
     def __init__(self):
         self.log_name = os.path.join(log_path, '{}.log'.format(time.strftime('%Y%m%d%H%M%S')))
 
@@ -50,7 +53,13 @@ class Logger:
 
     def get_func(self):
         # 封装 传入对应函数 行数
-        return ''
+        func = sys._getframe(3).f_code.co_name
+        if func == '<module>':
+            func = ''
+        line = sys._getframe(2).f_back.f_lineno
+        filename = sys._getframe(3).f_code.co_filename.split('\\')[-1]
+        self.func = filename + " " + func + " " + str(line)
+        return self.func
 
     def debug(self, message):
         self.log_config('debug', message)
