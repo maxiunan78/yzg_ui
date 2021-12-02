@@ -1,7 +1,30 @@
 # 自助买单页面元素
-'self_to_pay':
-
+'自助买单':
   '请选择油枪': '//*[@id="fpOrPr"]'
   '油枪选择': '//*[@id="js_dialog_1"]/div[2]/div/div'
+  '请选择金额':  '//*[@id="fuelOrderAmt"]'
+  '加油金额键盘':
+    '100': '//*[@id="js_dialog_2"]/div[2]/div[1]/div[1]'
+    '200': '//*[@id="js_dialog_2"]/div[2]/div[1]/div[2]'
+    '300': '//*[@id="js_dialog_2"]/div[2]/div[1]/div[3]'
+    '400': '//*[@id="js_dialog_2"]/div[2]/div[1]/div[4]'
+    '1': '//*[@id="js_dialog_2"]/div[2]/div[2]/div[1]/div[1]'
+    '4': '//*[@id="js_dialog_2"]/div[2]/div[2]/div[1]/div[2]'
+    '7': '//*[@id="js_dialog_2"]/div[2]/div[2]/div[1]/div[3]'
+    '.': '//*[@id="js_dialog_2"]/div[2]/div[2]/div[1]/div[4]'
+    '2': '//*[@id="js_dialog_2"]/div[2]/div[2]/div[2]/div[1]'
+    '5': '//*[@id="js_dialog_2"]/div[2]/div[2]/div[2]/div[2]'
+    '8': '//*[@id="js_dialog_2"]/div[2]/div[2]/div[2]/div[3]'
+    '0': '//*[@id="js_dialog_2"]/div[2]/div[2]/div[2]/div[4]'
+    '6': '//*[@id="js_dialog_2"]/div[2]/div[2]/div[3]/div[2]'
+    '3': '//*[@id="js_dialog_2"]/div[2]/div[2]/div[3]/div[1]'
+    '9': '//*[@id="js_dialog_2"]/div[2]/div[2]/div[3]/div[3]'
+    '删除': '//*[@id="js_dialog_2"]/div[2]/div[2]/div[3]/div[4]'
+    '确定': '//*[@id="js_dialog_2"]/div[2]/div[2]/div[4]'
+  '请选择加油员': '//*[@id="fuelAdmin"]'
+  '加油员列表': '/html/body/div[2]/div[2]/div[2]/div/div/div[3]/div'
+  '确认加油员': '//*[@id="weui-picker-confirm"]'
+
+
 
 

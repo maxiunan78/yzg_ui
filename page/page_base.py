@@ -15,6 +15,19 @@ from selenium.webdriver.support.wait import WebDriverWait
 from base import driver, yaml_handle
 
 
+def element_locator(locator_items: tuple) -> tuple:
+    """
+    元素定位方式
+    :param locator_items: 元素
+    :return: 元素类型和元素的元组
+    """
+    for locator_type, element in locator_items:
+        if locator_type.lower() == 'xpath':
+            return By.XPATH, element
+        elif locator_type.lower() == 'tag_name':
+            return By.TAG_NAME, element
+
+
 class Base(object):
     def __init__(self, browser=driver.chrome()):
         self.browser = browser
@@ -49,64 +62,52 @@ class Base(object):
         except Exception as msg:
             print("Error:{}".format(msg))
 
-    def element_locator(self, locator_type, element) -> tuple:
-        """
-        元素定位方式
-        :param locator_type: 元素类型
-        :param element: 元素
-        :return: 元素类型和元素的元组
-        """
-        if locator_type.lower() == 'xpath':
-            return By.XPATH, element
-        elif locator_type.lower() == 'tag_name':
-            return By.TAG_NAME, element
-
-    def find_element(self, locator_type, element, timeout=5):
+    def find_element(self, locator, timeout=5):
         """
         查找唯一元素
-        :param locator_type: 元素类型
-        :param element: 元素
+        :param locator: 元素
         :param timeout: 查询时间
         :return: 元素 或 错误
         """
         try:
             element = self.explicit_wait(timeout, 0.5) \
-                .until(EC.visibility_of_element_located(self.element_locator(locator_type, element)))
+                .until(EC.visibility_of_element_located(element_locator(locator)))
             return element
-        except:
+        except Exception as msg:
             print(u'页面元素不存在或不可见')
+            print("Error:{}".format(msg))
 
-    def find_elements(self, locator_type, element, timeout=5):
+    def find_elements(self, locator, timeout=5):
         """
         查找元素列表
-        :param locator_type: 元素类型
-        :param element: 元素
+
+        :param locator: 元素
         :param timeout: 查询时间
         :return: 元素 或 错误
         """
         try:
             elements = self.explicit_wait(timeout, 0.5) \
-                .until(EC.visibility_of_all_elements_located(self.element_locator(locator_type, element)))
+                .until(EC.visibility_of_all_elements_located(element_locator(locator)))
             return elements
-        except:
+        except Exception as msg:
             print(u'页面元素不存在或不可见')
+            print("Error:{}".format(msg))
 
-    def is_visibility(self, locator_type, element) -> bool:
+    def is_visibility(self, locator) -> bool:
         """
         判断元素是否可见
-        :param locator_type:
-        :param element:
+        :param locator: 元素
         :return:
         """
-        return self.browser.find_element(self.element_locator(locator_type, element)).is_displayed()
+        return self.browser.find_element(element_locator(locator)).is_displayed()
 
-    def click(self, locator_type, element):
+    def click(self, locator):
         """
         点击元素
-        :param locator_type: 元素类型
-        :param element: 元素
+        :param locator: 元素
+
         """
-        element = self.find_element(locator_type, element)
+        element = self.find_element(locator)
         element.click()
 
     def max(self):
@@ -122,15 +123,25 @@ class Base(object):
         """
         self.browser.minimize_window()
 
-    def send_keys(self, locator_type, element, *kwargs):
+    def send_keys(self, locator, *kwargs):
         """
-        键盘中按键或对输入框进行输入
-        :param locator_type: 元素类型
-        :param element: 元素
+        键盘中按键
+        :param locator: 元素
         :param kwargs:
         :return:
         """
-        self.find_element(locator_type, element).send_keys(*kwargs)
+        self.find_element(locator).send_keys(*kwargs)
+
+    def input_text(self, locator, text):
+        """
+        对输入框进行输入
+        :param locator: 元素
+
+        :param text: 输入的文本
+        :return:
+        """
+        self.find_element(locator).clear()
+        self.find_element(locator).send_keys(text)
 
     def switch_phone(self):
         """
@@ -153,14 +164,13 @@ class Base(object):
         """
         return self.browser.current_url
 
-    def get_text(self, locator_type, element):
+    def get_text(self, locator):
         """
         获取文本
-        :param locator_type: 元素类型
-        :param element: 元素
+        :param locator: 元素
         :return: 文本
         """
-        return self.find_element(locator_type, element).text
+        return self.find_element(locator).text
 
     def quit(self):
         """
@@ -179,3 +189,19 @@ class Base(object):
         前进
         """
         self.browser.forward()
+
+    def refresh(self):
+        """
+        刷新
+        """
+        self.browser.refresh()
+
+    def scroll_to(self, locator):
+        """
+        滚动到指定元素可见位置
+        :param locator: 元素
+        """
+        element = self.browser.find_element(element_locator(locator))
+        self.browser.execute_script("arguments[0].scrollIntoView();", locator)
+        return element
+

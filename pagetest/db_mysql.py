@@ -65,31 +65,3 @@ db = DB_sql(host="47.97.35.19",
             user="root",
             password="rain1q2w3e4r5t")
 
-start = time.time()
-sql = "select table_name from data_dict.self_table_config  where FIND_IN_SET('16548',hq_ids)"
-c = db.select_db(sql)
-# print(c)
-sql2 = "SELECT * FROM trade.2021_{} where ORDER_ID ='{}'".format(str(c['table_name']), 'SP1654810411637806351894')
-# d = db.select_db(sql2)
-# print(d)
-# print(db.get_sql_value(d, 'UPDATED_TIME'))
-#
-#
-sql3 = "select ID FROM  erp_hq.member_grade_config  WHERE erp_hq.member_grade_config.HQ_ID ='16548' and " \
-       "erp_hq.member_grade_config.GRADE_TYPE != '0' "
-# i = 0
-# while i < 10:
-#
-#     ref_order_id = db.get_sql_value(db.select_db(sql2), 'MEMBER_CARD_NO')
-#
-#     if ref_order_id != "None":
-#         break
-#     else:
-#         time.sleep(5)
-#
-#     i += 1
-x = db.select_db(sql3, False)
-print(x)
-print(db.get_sql_value(x[0], 'ID'))
-end = time.time()
-print(end - start)
