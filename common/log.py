@@ -24,7 +24,7 @@ class Logger:
         self.log_name = os.path.join(log_path, '{}.log'.format(time.strftime('%Y%m%d%H%M%S')))
 
     def log_config(self, level, message):
-        logger = logging.getLogger()
+        logger = logging.getLogger(__name__)
         logger.setLevel(logging.DEBUG)
         fh = logging.FileHandler(self.log_name, 'a', encoding='utf-8')
         fh.setLevel(logging.DEBUG)

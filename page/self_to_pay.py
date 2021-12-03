@@ -30,14 +30,14 @@ class SelfPay(page_base.Base):
         :param fp_num: 选择几号油枪
         :return: 有油枪返回元素 无返回False
         """
-        fp_total = len(self.find_elements('xpath', self.Element[u'油枪选择']))
+        fp_total = len(self.find_elements(('xpath', self.Element[u'油枪选择'])))
         if 0 < fp_num <= fp_total:
             element = ('xpath', self.Element[u'油枪选择'] + '[{}]'.format(fp_num))
             return element
         else:
             return False
 
-    def amt_keyboard(self, key: str):
+    def amt_element(self, key: str) -> str:
         """
         金额选择
         :param key: 键盘输入的按钮
@@ -45,16 +45,24 @@ class SelfPay(page_base.Base):
         """
         return self.Element[u'加油金额键盘'].get(key, u'键盘无此按钮')
 
-    def fuelling_confirm(self, num):
-        """
-        加油员选择
-        :param num:
-        :return:
-        """
-        fuelling_items = self.find_elements('xpath', self.Element[u'加油员列表'])
-        if 0 < num <= len(fuelling_items):
-            fuelling_item = ('xpath', self.Element[u'加油员列表'] + '[{}]'.format(num))
-            self.scroll_to(fuelling_item)
-            return fuelling_item
+    def amt_keyboard(self, key):
+        if self.amt_element(key) != u'键盘无此按钮':
+            return 'xpath', self.amt_element(key)
         else:
             return False
+
+    # def fuelling_confirm(self, num):
+    #     """
+    #     加油员选择
+    #     :param num:
+    #     :return:
+    #     """
+    #     fuelling_items = self.find_elements(('xpath', self.Element[u'加油员列表']))
+    #     if 0 < num <= len(fuelling_items):
+    #         fuelling_item = ('xpath', self.Element[u'加油员列表'] + '[{}]'.format(num))
+    #         print(fuelling_items)
+    #         print(fuelling_item)
+    #         self.scroll_to(fuelling_item)
+    #         return fuelling_item
+    #     else:
+    #         return False

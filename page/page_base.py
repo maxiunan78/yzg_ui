@@ -21,11 +21,11 @@ def element_locator(locator_items: tuple) -> tuple:
     :param locator_items: 元素
     :return: 元素类型和元素的元组
     """
-    for locator_type, element in locator_items:
-        if locator_type.lower() == 'xpath':
-            return By.XPATH, element
-        elif locator_type.lower() == 'tag_name':
-            return By.TAG_NAME, element
+    locator_type, element = locator_items
+    if locator_type.lower() == 'xpath':
+        return By.XPATH, element
+    elif locator_type.lower() == 'tag_name':
+        return By.TAG_NAME, element
 
 
 class Base(object):
@@ -33,9 +33,10 @@ class Base(object):
         self.browser = browser
 
         self.implicitly_wait(5)
-        self.switch_phone()
+
         self.max()
         # self.open_url(yaml_handle.param_value('url'))
+        self.switch_phone()
 
     def get_browser(self):
         return self.browser
@@ -70,8 +71,10 @@ class Base(object):
         :return: 元素 或 错误
         """
         try:
-            element = self.explicit_wait(timeout, 0.5) \
+            self.explicit_wait(timeout, 0.5) \
                 .until(EC.visibility_of_element_located(element_locator(locator)))
+            by, value = element_locator(locator)
+            element = self.browser.find_element(by, value)
             return element
         except Exception as msg:
             print(u'页面元素不存在或不可见')
@@ -86,8 +89,10 @@ class Base(object):
         :return: 元素 或 错误
         """
         try:
-            elements = self.explicit_wait(timeout, 0.5) \
+            self.explicit_wait(timeout, 0.5) \
                 .until(EC.visibility_of_all_elements_located(element_locator(locator)))
+            by, value = element_locator(locator)
+            elements = self.browser.find_elements(by, value)
             return elements
         except Exception as msg:
             print(u'页面元素不存在或不可见')
@@ -99,7 +104,8 @@ class Base(object):
         :param locator: 元素
         :return:
         """
-        return self.browser.find_element(element_locator(locator)).is_displayed()
+        by, value = element_locator(locator)
+        return self.browser.find_element(by, value).is_displayed()
 
     def click(self, locator):
         """
@@ -126,10 +132,12 @@ class Base(object):
     def send_keys(self, locator, *kwargs):
         """
         键盘中按键
-        :param locator: 元素
+        :param element: 元素
+        :param locator:
         :param kwargs:
         :return:
         """
+
         self.find_element(locator).send_keys(*kwargs)
 
     def input_text(self, locator, text):
@@ -147,8 +155,8 @@ class Base(object):
         """
         切换成手机浏览器模式
         """
-        self.send_keys('tag_name', 'body', Keys.F12)
-        self.send_keys('tag_name', 'body', Keys.CLEAR, Keys.SHIFT, 'm')
+        self.send_keys(('tag_name', 'body'), Keys.F12)
+        self.send_keys(('tag_name', 'body'), Keys.CLEAR, Keys.SHIFT, 'm')
 
     def implicitly_wait(self, timeout=5):
         """
@@ -201,7 +209,15 @@ class Base(object):
         滚动到指定元素可见位置
         :param locator: 元素
         """
-        element = self.browser.find_element(element_locator(locator))
-        self.browser.execute_script("arguments[0].scrollIntoView();", locator)
-        return element
+        element = self.find_element(locator)
+        self.browser.execute_script("arguments[0].scrollIntoView();", element)
+
+    def page_title(self) -> str:
+        """
+        获取网页标题
+        :return: 网页标题
+        """
+        return self.browser.title
+
+
 

@@ -24,7 +24,3 @@
   '请选择加油员': '//*[@id="fuelAdmin"]'
   '加油员列表': '/html/body/div[2]/div[2]/div[2]/div/div/div[3]/div'
   '确认加油员': '//*[@id="weui-picker-confirm"]'
-
-
-
-

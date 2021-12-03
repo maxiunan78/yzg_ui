@@ -7,4 +7,4 @@ settings = Dynaconf(
     settings_files=[r'config/settings.yaml'],
     environments=True)
 
-os.environ['ENV_FOR_DYNACONF'] = 'test'
+
