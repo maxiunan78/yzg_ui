@@ -16,13 +16,10 @@ from common import custom
 class SelfPay(page_base.Base):
     Element = yaml_handle.element_page(u'自助买单')
 
-    def __init__(self):
-        super(SelfPay, self).__init__()
-        self_pay_url = custom.post_params(yaml_handle.param_value('url'),
-                                          yaml_handle.param_dict('stationId', 'hqId', 'sourceType', 'openId'),
-                                          yaml_handle.param_value('selftopay')
-                                          )
-        self.open_url(self_pay_url)
+    def __init__(self, browser):
+        super(SelfPay, self).__init__(browser)
+
+
 
     def fp_choose_num(self, fp_num: int):
         """

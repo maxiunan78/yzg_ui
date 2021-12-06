@@ -6,7 +6,10 @@
 @Author  ：穆崧
 @Date    ：创建时间：2021/11/29 
 """
+import os
+import time
 
+import allure
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver import Keys
 from selenium.webdriver.common.by import By
@@ -28,14 +31,17 @@ def element_locator(locator_items: tuple) -> tuple:
         return By.TAG_NAME, element
 
 
+base_path = os.path.dirname(os.path.dirname(__file__))
+screenshot_path = os.path.join(base_path, 'screenshot')
+if not os.path.exists(screenshot_path):
+    os.mkdir(screenshot_path)
+
+
 class Base(object):
     def __init__(self, browser=driver.chrome()):
         self.browser = browser
-
         self.implicitly_wait(5)
-
         self.max()
-        # self.open_url(yaml_handle.param_value('url'))
         self.switch_phone()
 
     def get_browser(self):
@@ -219,5 +225,17 @@ class Base(object):
         """
         return self.browser.title
 
+    def get_screenshot(self, name=""):
+        try:
+            file_name = os.path.join(screenshot_path, '{}.png'.format(name + str(time.strftime('%Y%m%d%H%M%S'))))
+            self.browser.get_screenshot_as_file(file_name)
+            time.sleep(0.5)
+            return file_name
+        except Exception as e:
+            print(e)
 
-
+    def fail_picture(self, name=''):
+        f = self.get_screenshot(name)
+        filename = f.split('\\')[-1]
+        allure.attach.file(f, u'失败用例截图:{}'.format(filename), allure.attachment_type.PNG)
+        time.sleep(0.5)
