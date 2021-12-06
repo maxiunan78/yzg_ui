@@ -6,7 +6,6 @@
 @Author  ：穆崧
 @Date    ：创建时间：2021/12/6 
 """
-import os
 
 import pytest
 from base import driver
@@ -17,6 +16,11 @@ base_driver = None
 
 @pytest.fixture(scope='session')
 def driver_base(request):
+    """
+    初始化driver
+    :param request:
+    :return:
+    """
     global base_driver
     if base_driver is None:
         base_driver = driver.chrome()
@@ -30,22 +34,23 @@ def driver_base(request):
 
 
 def _fail_picture(name):
+    """
+    截图
+    :param name:
+    :return:
+    """
     browser = page_base.Base(base_driver)
     browser.fail_picture(name)
 
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_makereport():
-    '''
-    hook pytest失败
-    :param item:
-    :param call:
+    """
+    用例失败自动截图
     :return:
-    '''
-    # execute all other hooks to obtain the report object
+    """
     outcome = yield
     rep = outcome.get_result()
-    # we only look at actual failing test calls, not setup/teardown
     if rep.when == "call" and rep.failed:
         # mode = "a" if os.path.exists("failures") else "w"
         # with open("failures", mode) as f:

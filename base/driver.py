@@ -1,20 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 """
-@Project ：WX_youguanjia 
+@Project ：yzg_ui 
 @File    ：driver.py
 @Author  ：穆崧
 @Date    ：创建时间：2021/11/24 
 """
-import os
-import time
 
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from config import settings
 from selenium import webdriver
-from selenium.webdriver import Keys
-from selenium.webdriver.common.by import By
+
+from config import settings
 
 # 手机模式参数 需要放入配置
 UA = settings.UA
@@ -45,7 +40,3 @@ def chrome(option=True):
     else:
         driver = webdriver.Chrome()
         return driver
-
-
-
-

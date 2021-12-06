@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 """
-@Project ：WX_youguanjia 
+@Project ：yzg_ui 
 @File    ：yaml_handle.py
 @Author  ：穆崧
 @Date    ：创建时间：2021/11/29 
@@ -68,4 +68,3 @@ def parm_cookies(**keys):
         })
         cookies.append(cookie)
     return cookies
-

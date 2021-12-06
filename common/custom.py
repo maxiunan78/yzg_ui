@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 """
-@Project ：WX_youguanjia 
+@Project ：yzg_ui 
 @File    ：custom.py
 @Author  ：穆崧
 @Date    ：创建时间：2021/11/26 
@@ -10,13 +10,13 @@ import requests
 
 
 def request(method, url, **kwargs):
-    '''
+    """
     接口请求
     :param method: 请求方式
     :param url: 地址
     :param kwargs: 其他参数
     :return: 请求结果
-    '''
+    """
     if method.upper() == "GET":
         return requests.request(method=method, url=url, **kwargs)
     elif method.upper() == 'POST':
@@ -61,3 +61,13 @@ def post_params(url, params=None, path="") -> str:
         return url[:-1]
     else:
         return url
+
+
+def get_sql_value(result, name) -> str:
+    """
+    获取sql某一项值
+    :param result: sql查询的结果
+    :param name: 字段名
+    :return: str类型的值
+    """
+    return str(result[name])

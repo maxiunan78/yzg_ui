@@ -88,7 +88,7 @@ chrome.find_element(By.XPATH, request.get_key(5)).click()
 # chrome.find_element(By.XPATH, request.get_key('sumit')).click()
 print('选择加油员')
 if chrome.find_element(By.XPATH, '//*[@id="fuellingAdmin"]').is_displayed():
-    print(u'有加油员')
+    print(U'有加油员')
     try:
         # /html/body/div[2]/div[2]/div[2]/div/div/div[3]
         chrome.find_element(By.XPATH, '//*[@id="fuellingAdmin"]').click()
@@ -105,11 +105,11 @@ if chrome.find_element(By.XPATH, '//*[@id="fuellingAdmin"]').is_displayed():
         # chrome.execute_script("arguments[0].scrollIntoView();", target)
         # target.click()
 
-        print(u'选择加油员成功')
+        print(U'选择加油员成功')
     except RuntimeError:
-        print(u'选择加油员失败')
+        print(U'选择加油员失败')
 else:
-    print(u'无加油员')
+    print(U'无加油员')
 WebDriverWait(chrome, 2, 0.5).until(EC.visibility_of_element_located((By.XPATH, request.get_key('sumit'))))
 chrome.find_element(By.XPATH, request.get_key('sumit')).click()
 
@@ -122,9 +122,9 @@ receivable_amount = float(
 discount_amount = float(chrome.find_element(By.XPATH, '//*[@id="totalDiscount"]').text)
 pay_amount = float(chrome.find_element(By.XPATH, '//*[@id="payAmt2"]').text)
 if receivable_amount == discount_amount + pay_amount:
-    print(u'支付金额正确')
+    print(U'支付金额正确')
 else:
-    print(u'支付金额错误')
+    print(U'支付金额错误')
 time.sleep(0.5)
 # 点击支付
 chrome.find_element(By.XPATH, '/html/body/div/footer/div/div[2]/span').click()
@@ -144,7 +144,7 @@ pay_time = db.get_sql_value(d, 'PAY_TIME')
 # 获取页面成功的元素的文本
 success = chrome.find_element(By.XPATH, '/html/body/div/header/p').text
 
-if pay_result == '1' and success == u'支付成功':
+if pay_result == '1' and success == U'支付成功':
     print('支付成功')
 else:
     print('支付失败')

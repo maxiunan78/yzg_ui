@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 """
-@Project ：WX_youguanjia 
+@Project ：yzg_ui 
 @File    ：page_base.py
 @Author  ：穆崧
 @Date    ：创建时间：2021/11/29 
@@ -15,7 +15,7 @@ from selenium.webdriver import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 
-from base import driver, yaml_handle
+from common import log
 
 
 def element_locator(locator_items: tuple) -> tuple:
@@ -31,6 +31,7 @@ def element_locator(locator_items: tuple) -> tuple:
         return By.TAG_NAME, element
 
 
+logger = log.Logger()
 base_path = os.path.dirname(os.path.dirname(__file__))
 screenshot_path = os.path.join(base_path, 'screenshot')
 if not os.path.exists(screenshot_path):
@@ -38,7 +39,7 @@ if not os.path.exists(screenshot_path):
 
 
 class Base(object):
-    def __init__(self, browser=driver.chrome()):
+    def __init__(self, browser):
         self.browser = browser
         self.implicitly_wait(5)
         self.max()
@@ -67,7 +68,7 @@ class Base(object):
         try:
             self.explicit_wait(timeout, 0.5)
         except Exception as msg:
-            print("Error:{}".format(msg))
+            logger.error("Error:{}".format(msg))
 
     def find_element(self, locator, timeout=5):
         """
@@ -83,8 +84,7 @@ class Base(object):
             element = self.browser.find_element(by, value)
             return element
         except Exception as msg:
-            print(u'页面元素不存在或不可见')
-            print("Error:{}".format(msg))
+            logger.error(U'页面元素不存在或不可见  Error:{}'.format(msg))
 
     def find_elements(self, locator, timeout=5):
         """
@@ -101,8 +101,7 @@ class Base(object):
             elements = self.browser.find_elements(by, value)
             return elements
         except Exception as msg:
-            print(u'页面元素不存在或不可见')
-            print("Error:{}".format(msg))
+            logger.error(U'页面元素不存在或不可见  Error:{}'.format(msg))
 
     def is_visibility(self, locator) -> bool:
         """
@@ -138,8 +137,7 @@ class Base(object):
     def send_keys(self, locator, *kwargs):
         """
         键盘中按键
-        :param element: 元素
-        :param locator:
+        :param locator: 元素属性
         :param kwargs:
         :return:
         """
@@ -215,8 +213,11 @@ class Base(object):
         滚动到指定元素可见位置
         :param locator: 元素
         """
-        element = self.find_element(locator)
-        self.browser.execute_script("arguments[0].scrollIntoView();", element)
+        try:
+            element = self.find_element(locator)
+            self.browser.execute_script("arguments[0].scrollIntoView();", element)
+        except Exception as msg:
+            logger.error(U'滚动页面失败  Error:{}'.format(msg))
 
     def page_title(self) -> str:
         """
@@ -232,10 +233,10 @@ class Base(object):
             time.sleep(0.5)
             return file_name
         except Exception as e:
-            print(e)
+            logger.error(U'截图失败  Error:{}'.format(e))
 
     def fail_picture(self, name=''):
         f = self.get_screenshot(name)
         filename = f.split('\\')[-1]
-        allure.attach.file(f, u'失败用例截图:{}'.format(filename), allure.attachment_type.PNG)
+        allure.attach.file(f, U'失败用例截图:{}'.format(filename), allure.attachment_type.PNG)
         time.sleep(0.5)

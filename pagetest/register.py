@@ -64,7 +64,7 @@ pars = {
 }
 # res = request.request(method="POST", url=code_url, params=pars)
 # # 对返回的接口进行判断
-# if res.json()['msg'] == u'操作成功' and res.json()['success'] is True:
+# if res.json()['msg'] == U'操作成功' and res.json()['success'] is True:
 #     time.sleep(0.5)
 # else:
 #     print('一分钟内')

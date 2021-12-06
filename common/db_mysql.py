@@ -1,18 +1,20 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 """
-@Project ：WX_youguanjia 
+@Project ：yzg_ui 
 @File    ：db_mysql.py
 @Author  ：穆崧
 @Date    ：创建时间：2021/11/25 
 """
 import pymysql
 from config import settings
+from common import log
 
 host = settings.database['host']
 port = settings.database['port']
 user = settings.database['user']
 password = settings.database['password']
+logger = log.Logger()
 
 
 class DB_sql:
@@ -50,18 +52,5 @@ class DB_sql:
             self.cur.execute(sql)
             self.db.commit()
         except Exception as e:
-            # 应该封装logger,暂时print
-            print("操作MySQL出现错误，错误原因：{}".format(e))
+            logger.error(U"操作MySQL出现错误，错误原因：{}".format(e))
             self.db.rollback()
-
-    def get_sql_value(self, result, name) -> str:
-        """
-        获取sql某一项值
-        :param result: sql查询的结果
-        :param name: 字段名
-        :return: str类型的值
-        """
-        return str(result[name])
-
-
-
