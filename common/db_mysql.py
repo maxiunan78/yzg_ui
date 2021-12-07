@@ -52,5 +52,5 @@ class DB_sql:
             self.cur.execute(sql)
             self.db.commit()
         except Exception as e:
-            logger.error(U"操作MySQL出现错误，错误原因：{}".format(e))
+            logger.error(U'操作MySQL出现错误，错误原因：{}'.format(e))
             self.db.rollback()

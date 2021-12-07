@@ -84,7 +84,7 @@ class Base(object):
             element = self.browser.find_element(by, value)
             return element
         except Exception as msg:
-            logger.error(U'页面元素不存在或不可见, {}'.format(msg),5)
+            logger.error(U'页面元素不存在或不可见, {}'.format(msg), 5)
 
     def find_elements(self, locator, timeout=5):
         """
@@ -101,7 +101,7 @@ class Base(object):
             elements = self.browser.find_elements(by, value)
             return elements
         except Exception as msg:
-            logger.error(U'页面元素不存在或不可见, {}'.format(msg),5)
+            logger.error(U'页面元素不存在或不可见, {}'.format(msg), 5)
 
     def is_visibility(self, locator) -> bool:
         """
@@ -217,7 +217,7 @@ class Base(object):
             element = self.find_element(locator)
             self.browser.execute_script("arguments[0].scrollIntoView();", element)
         except Exception as msg:
-            logger.error(U'滚动页面失败, {}'.format(msg),5)
+            logger.error(U'滚动页面失败, {}'.format(msg), 5)
 
     def page_title(self) -> str:
         """
@@ -233,7 +233,7 @@ class Base(object):
             time.sleep(0.5)
             return file_name
         except Exception as e:
-            logger.error(U'截图失败, {}'.format(e),5)
+            logger.error(U'截图失败, {}'.format(e), 5)
 
     def fail_picture(self, name=''):
         f = self.get_screenshot(name)

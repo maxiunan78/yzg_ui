@@ -11,7 +11,8 @@ import os
 import time
 
 import pytest
+
 os.environ['ENV_FOR_DYNACONF'] = 'test'
 
 if __name__ == '__main__':
-    pytest.main(['-s', '-q', '--alluredir=./result/{}'.format('json')])
+    pytest.main(['-v', '-q', '-s',  '--alluredir=./result/{}'.format('json')])
