@@ -9,7 +9,7 @@
 
 from selenium import webdriver
 
-from config import settings
+from config.config import settings
 
 # 手机模式参数 需要放入配置
 UA = settings.UA

@@ -7,7 +7,7 @@
 @Date    ：创建时间：2021/11/25 
 """
 import pymysql
-from config import settings
+from config.config import settings
 from common import log
 
 host = settings.database['host']

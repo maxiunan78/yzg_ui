@@ -7,12 +7,11 @@
 @Date    ：创建时间：2021/11/29 
 """
 import os
-import time
 
 import yaml
 
 from common import log
-from config import settings
+from config.config import settings
 
 logger = log.Logger()
 
