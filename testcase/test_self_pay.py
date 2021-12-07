@@ -23,6 +23,10 @@ log = Logger()
 @allure.feature(U'微信自助买单')
 @allure.description(U'测试微信自助买单功能')
 class TestSelfPay:
+    fp_no = None
+    fp = None
+    order_amt = None
+
     @pytest.fixture(scope='class')
     def start(self, driver_base):
         self.browser = SelfPay(driver_base)
@@ -33,7 +37,7 @@ class TestSelfPay:
         self.browser.open_url(self_pay_url)
         return self.browser
 
-    @allure.story(U'自助买单页--创建订单')
+    @allure.story(U'自助买单--创建订单')
     def test_self_to_pay(self, start):
         with allure.step(U'加油员选择'):
             log.info(U"确认是否存在加油员")
@@ -59,5 +63,15 @@ class TestSelfPay:
             start.click(start.amt_keyboard('9'))
             start.click(start.amt_keyboard(U'确定'))
         with allure.step(U'跳转'):
+            TestSelfPay.fp_no = start.get_text(('xpath', start.Element[U'请选择油枪'])).split(' ')[0]
+            TestSelfPay.fp = start.get_text(('xpath', start.Element[U'请选择油枪'])).split(' ')[1]
+            TestSelfPay.order_amt = start.get_text(('xpath', start.Element[U'请选择金额']))
             time.sleep(1)
             assert start.page_title() == U'确认订单', log.error(U'创建订单失败')
+
+    @allure.story(U'自助买单--订单支付')
+    def test_order_pay(self, start):
+        with allure.step(U'确认订单'):
+            print(TestSelfPay.fp_no)
+            print(TestSelfPay.fp)
+            print(TestSelfPay.order_amt)
