@@ -7,9 +7,11 @@
 @Date    ：创建时间：2021/11/29 
 """
 from common.read_data import Data
+from common.db_mysql import DB_sql
 
 DATA = Data().data
 ELEMENT = Data().element
+DATABASE = DB_sql()
 
 
 def element_page(key) -> dict:
@@ -68,3 +70,21 @@ def parm_cookies(**keys):
         })
         cookies.append(cookie)
     return cookies
+
+
+def get_sql_value(result, name):
+    """
+    获取数据库查询出来的数据
+    :param result: sql查询的结果
+    :param name: 字段名
+    :return: str类型的值
+    """
+    if type(result) == dict:
+        return str(result[name])
+    else:
+        result_list = []
+        for i in result:
+            result_list.append(str(i[name]))
+        return result_list
+
+# 获取会员信息  crm.member 金额 member_account 成长值 等级 member_account_upgrade_history  erp_hq member_grade_config   积分

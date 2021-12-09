@@ -51,19 +51,19 @@ elment.send_keys(Keys.F12)
 elment.send_keys(Keys.CLEAR, Keys.SHIFT, 'm')
 # 保存cookies  微信id 站点 会员号 参数
 cookies_info = [
-#     {
-#     'domain': 'wx.test.youzhanguanjia.com',
-#     'name': 'WX_COOKIE_OP',
-#     'value': 'o3Uia0XxRtKiO4g-3ryMKI1r4NIA'
-# }, {
-#     'domain': 'wx.test.youzhanguanjia.com',
-#     'name': 'WX_COOKIE_ME',
-#     'value': '123466864'
-# }, {
-#     'domain': 'wx.test.youzhanguanjia.com',
-#     'name': 'WX_COOKIE_HQ',
-#     'value': '16548'
-# },
+    {
+        'domain': 'wx.test.youzhanguanjia.com',
+        'name': 'WX_COOKIE_OP',
+        'value': 'o3Uia0XxRtKiO4g-3ryMKI1r4NIA'
+    }, {
+        'domain': 'wx.test.youzhanguanjia.com',
+        'name': 'WX_COOKIE_ME',
+        'value': '123466864'
+    }, {
+        'domain': 'wx.test.youzhanguanjia.com',
+        'name': 'WX_COOKIE_HQ',
+        'value': '16548'
+    },
     # {
     #     'domain': 'wx.test.youzhanguanjia.com',
     #     'name': 'openId',
@@ -104,7 +104,6 @@ for cookie in cookies_info:
     chrome.add_cookie(cookie)
 
 chrome.get(center_url)
-
 
 time.sleep(2)
 chrome.quit()

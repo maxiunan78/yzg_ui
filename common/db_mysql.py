@@ -32,18 +32,35 @@ class DB_sql:
         self.cur.close()
         self.db.close()
 
-    def select_db(self, sql, single=True):
-        """查询"""
-        self.db.ping(reconnect=True)
-        # 使用 execute() 执行sql
-        self.cur.execute(sql)
-        # 使用 fetchall() 获取查询结果
-        if single:
-            data = self.cur.fetchone()
-            return data
-        else:
-            data = self.cur.fetchall()
-            return data
+    def select_db(self, single=True, **kwargs):
+        """
+        查询语句
+        :param single: 单条：True 多条：False
+        :param kwargs: 查询字段
+        :return: 数据
+        """
+        try:
+            self.db.ping(reconnect=True)
+            # 列
+            column = 'column' in kwargs and kwargs['column'] or '*'
+            # 表
+            table = 'table' in kwargs and kwargs['table']
+            # 条件
+            where = 'where' in kwargs and 'where ' + kwargs['where'] or ''
+            # 其他 如排序 输出限制
+            other = 'other' in kwargs and kwargs['other'] or ''
+            sql = f'select {column} from {table} {where} {other}'
+            # 使用 execute() 执行sql
+            self.cur.execute(sql)
+            if single:
+                data = self.cur.fetchone()
+                return data
+            else:
+                data = self.cur.fetchall()
+                return list(data)
+        except Exception as e:
+            logger.error("操作MySQL出现错误，错误原因：{}".format(e))
+            self.db.rollback()
 
     def execute_db(self, sql):
         """更新、删除等操作"""

@@ -46,8 +46,8 @@ chrome.get(url)
 time.sleep(0.5)
 # 页面操作 元素需要封装   输入会员信息 姓名 号码    页面元素变动--填写内容变动 需要获取需要填写的内容
 # //*[@id="app"]/section/div[1]/section/div[2]/span    根据text进行输入
-chrome.find_element(By.XPATH, '//*[@id="app"]/section/div[1]/section/div[1]/input').send_keys('UItest')
-chrome.find_element(By.XPATH, '//*[@id="app"]/section/div[1]/section/div[2]/input').send_keys('13290050487')
+chrome.find_element(By.XPATH, '//*[@id="app"]/section/div[1]/section/div[1]/input').send_keys('UI123test')
+chrome.find_element(By.XPATH, '//*[@id="app"]/section/div[1]/section/div[2]/input').send_keys('15519036084')
 # 验证码用接口发送 ，因为无随机码，注册不合法  需要封装请求接口
 # chrome.find_element(By.XPATH, '//*[@id="app"]/section/div[1]/section/div[3]/div[2]/button/span[1]').click()
 # time.sleep(6)
@@ -59,20 +59,22 @@ pars = {
     # 'sourceType': '1',
     # 'openId': 'o3Uia0XxRtKiO4g-3ryMKI1r4NIA'
     # 'memberId': '123466020'
-    'phoneNum': '13290050487'
+    'phoneNum': '15519036084'
 
 }
-# res = request.request(method="POST", url=code_url, params=pars)
-# # 对返回的接口进行判断
-# if res.json()['msg'] == U'操作成功' and res.json()['success'] is True:
-#     time.sleep(0.5)
-# else:
-#     print('一分钟内')
+res = request.request(method="POST", url=code_url, params=pars)
+# 对返回的接口进行判断
+if res.json()['msg'] == U'操作成功' and res.json()['success'] is True:
+    time.sleep(0.5)
+else:
+    print('一分钟内')
+
 # 数据库查询 需要封装读取
-sql = r"SELECT `CODE` FROM weixin.verification_code where PHONE_NUM = '13290050487' ORDER BY SENT_TIME desc LIMIT 1"
+sql = r"SELECT `CODE` FROM weixin.verification_code where PHONE_NUM = '15519036084' ORDER BY SENT_TIME desc LIMIT 1"
 c = db.select_db(sql)
 # 输入会员信息 手机验证码
-chrome.find_element(By.XPATH, '//*[@id="app"]/section/div[1]/section/div[3]/div[1]/input').send_keys(c[0]['CODE'])
+time.sleep(1)
+chrome.find_element(By.XPATH, '//*[@id="app"]/section/div[1]/section/div[3]/div[1]/input').send_keys(c['CODE'])
 # 注册站点
 chrome.find_element(By.XPATH, '//*[@id="app"]/section/div[1]/section/div[5]/input').click()
 # 滚动选择站点  陈龙测试
@@ -88,12 +90,16 @@ print(chrome.current_url)
 par = request.get_parms(chrome.current_url)
 print(par)
 time.sleep(0.5)
-sql2 = r"select * from  crm.member  where MEMBER_ID = '{}' and PHONE_NUM = '{}' and `STATUS` = 1 ORDER BY ID  DESC " \
-       r"LIMIT 1 ".format(par['memberId'], "13290050487")
-ac = db.select_db(sql2)
-if ac:
-    print(ac)
-    print("注册成功")
+# sql2 = r"select * from  crm.member  where MEMBER_ID = '{}' and PHONE_NUM = '{}' and `STATUS` = 1 ORDER BY ID  DESC " \
+#        r"LIMIT 1 ".format(par['memberId'], "15519036084")
+# ac = db.select_db(sql2)
+# if ac:
+#     print(ac)
+#     print("注册成功")
+# else:
+#     print('注册失败')
+if 'memberId' in par.keys():
+    print('注册成功')
 else:
     print('注册失败')
 chrome.quit()

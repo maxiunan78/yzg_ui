@@ -71,8 +71,8 @@ chrome.find_element(By.XPATH, '//*[@id="js_dialog_1"]/div[2]/div/div[1]').click(
 print('输入金额')  # log
 chrome.find_element(By.XPATH, '//*[@id="fuelOrderAmt"]').click()
 chrome.find_element(By.XPATH, request.get_key(5)).click()
-chrome.find_element(By.XPATH, request.get_key('.')).click()
-chrome.find_element(By.XPATH, request.get_key(0)).click()
+# chrome.find_element(By.XPATH, request.get_key('.')).click()
+# chrome.find_element(By.XPATH, request.get_key(0)).click()
 chrome.find_element(By.XPATH, request.get_key(5)).click()
 
 # 选择加油员 需要考虑滚动和确认问题 无加油员情况
