@@ -8,7 +8,7 @@
 """
 
 import pytest
-from base import driver
+from base import driver, yaml_handle
 from page import page_base
 
 base_driver = None
@@ -62,3 +62,9 @@ def pytest_runtest_makereport():
         #     extra = ""
         #     f.write(rep.nodeid + extra + "\n")
         _fail_picture(rep.nodeid.split('::')[-1])
+
+
+@pytest.fixture(scope='session')
+def member_info():
+    member_info = yaml_handle.get_member()
+    return member_info

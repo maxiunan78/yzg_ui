@@ -1,6 +1,8 @@
 # 自助买单页面元素
 '自助买单':
+  # 订单页
   '请选择油枪': '//*[@id="fpOrPr"]'
+  #读取油枪
   '油枪选择': '//*[@id="js_dialog_1"]/div[2]/div/div'
   '请选择金额':  '//*[@id="fuelOrderAmt"]'
   '加油金额键盘':
@@ -24,3 +26,17 @@
   '请选择加油员': '//*[@id="fuelAdmin"]'
   '加油员列表': '/html/body/div[2]/div[2]/div[2]/div/div/div[3]/div'
   '确认加油员': '//*[@id="weui-picker-confirm"]'
+
+  #待支付页
+  '待支付油品': '/html/body/div/header/div/div[2]/span[2]'
+  '待支付订单金额': '/html/body/div/section/div[1]/div/div/div/div[1]/div[2]/span'
+  '优惠金额': '//*[@id="totalDiscount"]'
+  '待支付金额': '//*[@id="payAmt2"]'
+  '确认支付': '/html/body/div/footer/div/div[2]/span'
+
+  #支付成功页
+  '支付成功': '/html/body/div/header/p'
+  '支付金额': '/html/body/div/section/div[1]/div[1]/span[2]'
+  '订单金额': '/html/body/div/section/div[1]/div[2]'
+   # 读取油品信息
+  '订单油品信息': '/html/body/div/section/div[2]/div'

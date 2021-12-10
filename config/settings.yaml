@@ -15,4 +15,5 @@
           "pixelRatio": 3.0
   'datapath': 'test_data.yaml'
   'elementpath': 'element.yaml'
+  'casedatapath': 'testcase_data.yaml'
 

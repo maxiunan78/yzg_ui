@@ -35,10 +35,12 @@ class Data:
     def __init__(self):
         data_path = os.path.join(data_list, settings.datapath)
         element_path = os.path.join(data_list, settings.elementpath)
-        if not os.path.exists(data_path) or os.path.exists(element_path):
+        case_path = os.path.join(data_list, settings.casedatapath)
+        if not(os.path.exists(data_path) or os.path.exists(element_path) or os.path.exists(case_path)):
             logger.error(U'无存放数据')
         self.data = load_yaml(data_path)
         self.element = load_yaml(element_path)
+        self.case = load_yaml(case_path)
 
     def write_data(self, data, filename):
         """

@@ -32,32 +32,37 @@ class SelfPay(page_base.Base):
         else:
             return False
 
-    def amt_element(self, key: str) -> str:
+    def amt_keyboard(self, key):
         """
         金额选择
-        :param key: 键盘输入的按钮
-        :return: 返回元素的数据 无元素返回提示
+        :param key: 键盘按钮
+        :return: 元素
         """
-        return self.Element[U'加油金额键盘'].get(key, U'键盘无此按钮')
-
-    def amt_keyboard(self, key):
-        if self.amt_element(key) != U'键盘无此按钮':
-            return 'xpath', self.amt_element(key)
+        if self.Element[U'加油金额键盘'].get(str(key), U'键盘无此按钮') != U'键盘无此按钮':
+            return 'xpath', self.Element[U'加油金额键盘'].get(str(key), U'键盘无此按钮')
         else:
             return False
 
-    # def fuelling_confirm(self, num):
-    #     """
-    #     加油员选择
-    #     :param num:
-    #     :return:
-    #     """
-    #     fuelling_items = self.find_elements(('xpath', self.Element[U'加油员列表']))
-    #     if 0 < num <= len(fuelling_items):
-    #         fuelling_item = ('xpath', self.Element[U'加油员列表'] + '[{}]'.format(num))
-    #         print(fuelling_items)
-    #         print(fuelling_item)
-    #         self.scroll_to(fuelling_item)
-    #         return fuelling_item
-    #     else:
-    #         return False
+    def amt_input(self, num: float) -> list:
+        """
+        输入的金额进行分割
+        :param num: 金额
+        :return: 元素列表
+        """
+        amt = []
+        for i in str(num):
+            amt.append(self.amt_keyboard(i))
+        return amt
+
+    def pay_oil_info(self):
+        """
+        获取支付成功后油品信息
+        :return:
+        """
+        oil_info = {}
+        div = self.find_elements(('xpath', self.Element[U'订单油品信息']))
+        for i in range(1, len(div) + 1):
+            p1 = self.get_text(('xpath', self.Element[U'订单油品信息'] + f'[{i}]/div[1]'))
+            p2 = self.get_text(('xpath', self.Element[U'订单油品信息'] + f'[{i}]/div[2]'))
+            oil_info.update({p1: p2})
+        return oil_info

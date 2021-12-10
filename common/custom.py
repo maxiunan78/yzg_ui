@@ -33,6 +33,7 @@ def get_params(url) -> dict:
     :param url: 地址
     :return: 以字典形式保存的参数
     """
+
     url_params = url.split("?")[-1].split('&')
     params = {}
     for i in url_params:
