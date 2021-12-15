@@ -89,22 +89,22 @@ def get_sql_value(result, name):
         return result_list
 
 
-# 获取会员信息  crm.member 金额 member_account 成长值 等级 member_account_upgrade_history  erp_hq member_grade_config   积分
+# 获取会员信息  crm.member 金额 member_account 成长值 等级   erp_hq member_grade_config   积分
 def get_member(member_id=param_value('memberId')):
     member_info = {}
     member = db.select_db(column='HQ_MEMBER_GRADE_ID,HQ_ID,MEMBER_ID,MEMBER_NAME,PHONE_NUM,HQ_MEMBER_GRADE_NAME',
-                                table='crm.member', where=f'MEMBER_ID = {member_id}')
+                          table='crm.member', where=f'MEMBER_ID = {member_id}')
     member_info.update(member)
     member_account = db.select_db(column='AMOUNT, POINT',
-                                        table='crm.member_account', where=f'MEMBER_ID = {member_id}')
+                                  table='crm.member_account', where=f'MEMBER_ID = {member_id}')
     member_info.update(member_account)
     grade_type = db.select_db(column='GRADE_TYPE', table='erp_hq.member_grade_config',
-                                    where=f'ID = {member["HQ_MEMBER_GRADE_ID"]}')
+                              where=f'ID = {member["HQ_MEMBER_GRADE_ID"]}')
 
     v, = grade_type.values()
     if v != 0:
         upgrade_value = db.select_db(column='MEMBER_UPGRADE_VALUE', table='crm.member_grade',
-                                           where=f'MEMBER_ID = {member_id}')
+                                     where=f'MEMBER_ID = {member_id}')
 
         member_info.update(upgrade_value)
     return member_info

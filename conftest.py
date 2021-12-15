@@ -64,7 +64,3 @@ def pytest_runtest_makereport():
         _fail_picture(rep.nodeid.split('::')[-1])
 
 
-@pytest.fixture(scope='session')
-def member_info():
-    member_info = yaml_handle.get_member()
-    return member_info
