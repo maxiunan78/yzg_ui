@@ -28,6 +28,8 @@ class TestSelfPay:
 
     @pytest.fixture(scope='class')
     def start(self, driver_base):
+        # 需要配置
+        # 初始化
         self.browser = SelfPay(driver_base)
         self_pay_url = custom.post_params(yaml_handle.param_value('url'),
                                           yaml_handle.param_dict('stationId', 'hqId', 'sourceType', 'openId'),
@@ -93,7 +95,6 @@ class TestSelfPay:
     def test_payment(self, start):
         with allure.step(U'确认支付'):
             pay = ('xpath', start.Element[U'支付成功'])
-            log.info(start.get_cur_url())
             TestSelfPay.tmp.update(custom.get_params(start.get_cur_url()))
             assert start.is_visibility(pay) and start.get_text(pay) == U'支付成功', log.error(U'支付失败')
         with allure.step(U'确认油品信息'):

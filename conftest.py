@@ -8,7 +8,8 @@
 """
 
 import pytest
-from base import driver, yaml_handle
+from base import driver
+from base.preconditions import Precondition
 from page import page_base
 
 base_driver = None
@@ -64,7 +65,7 @@ def pytest_runtest_makereport():
         _fail_picture(rep.nodeid.split('::')[-1])
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='class')
 def member_info():
-    member_info = yaml_handle.get_member()
+    member_info = Precondition.get_member_info
     return member_info

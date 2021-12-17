@@ -64,11 +64,3 @@ def post_params(url, params=None, path="") -> str:
         return url
 
 
-def get_sql_value(result, name) -> str:
-    """
-    获取sql某一项值
-    :param result: sql查询的结果
-    :param name: 字段名
-    :return: str类型的值
-    """
-    return str(result[name])
