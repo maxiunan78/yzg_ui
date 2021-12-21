@@ -2,15 +2,17 @@
 # -*- coding:utf-8 -*-
 
 # author:maxiunan
+from selenium.webdriver.common.by import By
 
-from base import yaml_handle
-from common.custom import request
-from common import log
-from page import page_base
+from yzg_ui.base import yaml_handle
+from yzg_ui.common.custom import request
+from yzg_ui.common import log
+from yzg_ui.common.db_mysql import DB_sql
+from yzg_ui.page import page_base
 import re
-import time
-from base import driver
-from common import custom
+from  time import sleep
+from yzg_ui.base import driver
+from yzg_ui.common import custom
 
 logger = log.Logger()
 
@@ -34,13 +36,20 @@ class Register(page_base.Base):
             logger.error('{}'.format(msg))
         else:
             if re.json()['msg'] == U'操作成功' and re.json()['success'] is True:
-                time.sleep(0.5)
+                sleep(0.5)
+                sql = "SELECT `CODE` FROM weixin.verification_code where PHONE_NUM = {} ORDER BY SENT_TIME desc LIMIT 1".format(yaml_handle.case_data[u'手机号'])
+                result = DB_sql().select_db(sql=sql)
+                self.input_text(('xpath', self.Element[u'验证码']), result['CODE'])
             else:logger.info('一分钟内')
 
     def choice_station(self,stationName):
         self.click(('xpath', self.Element[U'选择油站']))
-        self.scroll_to(("xpath",'//div/p[text()={}]'.format(stationName)))
-        self.click(("xpath",'//div/p[text()={}]'.format(stationName)))
+        element = self.browser.find_element(By.XPATH,'//div/p[text()={}]'.format('\''+stationName + '\''))
+        try:
+            self.browser.execute_script("arguments[0].scrollIntoView();", element)
+        except Exception as e:
+            log.info(U'滚动页面失败, {}'.format(e))
+        element.click()
 
 # if __name__ == "__main__":
 #     ch = driver.chrome()
