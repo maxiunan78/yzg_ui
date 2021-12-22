@@ -4,15 +4,15 @@
 # author:maxiunan
 from selenium.webdriver.common.by import By
 
-from yzg_ui.base import yaml_handle
-from yzg_ui.common.custom import request
-from yzg_ui.common import log
-from yzg_ui.common.db_mysql import DB_sql
-from yzg_ui.page import page_base
+from base import yaml_handle
+from common.custom import request
+from common import log
+from common.db_mysql import DB_sql
+from page import page_base
 import re
 from  time import sleep
-from yzg_ui.base import driver
-from yzg_ui.common import custom
+from base import driver
+from common import custom
 
 logger = log.Logger()
 
@@ -28,7 +28,7 @@ class Register(page_base.Base):
     def input_phone(self, phoneNum):
         self.input_text(('xpath', self.Element[U'手机号']), phoneNum)
 
-    def input_code(self, code_url, pars):
+    def get_code(self, code_url, pars):
         try:
             re = request("POST", url=code_url, params=pars)
             # re.raise_for_status()
@@ -39,8 +39,12 @@ class Register(page_base.Base):
                 sleep(0.5)
                 sql = "SELECT `CODE` FROM weixin.verification_code where PHONE_NUM = {} ORDER BY SENT_TIME desc LIMIT 1".format(yaml_handle.case_data[u'手机号'])
                 result = DB_sql().select_db(sql=sql)
-                self.input_text(('xpath', self.Element[u'验证码']), result['CODE'])
-            else:logger.info('一分钟内')
+                return result['CODE']
+            else:
+                logger.info('一分钟内不能再发送 or 发送短信达到阀值')
+
+    def input_code(self,code):
+        self.input_text(('xpath', self.Element[u'验证码']), code)
 
     def choice_station(self,stationName):
         self.click(('xpath', self.Element[U'选择油站']))
@@ -50,6 +54,9 @@ class Register(page_base.Base):
         except Exception as e:
             log.info(U'滚动页面失败, {}'.format(e))
         element.click()
+
+    def submit(self):
+        self.click(('xpath', self.Element[u'确认提交']))
 
 # if __name__ == "__main__":
 #     ch = driver.chrome()
