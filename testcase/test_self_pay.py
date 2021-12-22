@@ -85,6 +85,7 @@ class TestSelfPay:
         with allure.step(U'确认优惠金额'):
             discount = float(start.get_text(('xpath', start.Element[U'优惠金额'])))
             pay_amt = float(start.get_text(('xpath', start.Element[U'待支付金额'])))
+            TestSelfPay.tmp.update({U'支付金额': pay_amt})
             assert pay_amt == (order_amt - discount), log.error(U'支付金额错误')
         with allure.step(U'支付'):
             start.click(('xpath', start.Element[U'确认支付']))
@@ -92,12 +93,13 @@ class TestSelfPay:
             assert start.page_title() == U'付款成功', log.error(U'支付跳转失败')
 
     @allure.story(U'自助买单--支付完成')
-    def test_payment(self, start):
+    def test_payment(self, start, member_info):
         with allure.step(U'确认支付'):
             pay = ('xpath', start.Element[U'支付成功'])
-            TestSelfPay.tmp.update(custom.get_params(start.get_cur_url()))
+            TestSelfPay.tmp.update({'selfPayOrderId': custom.get_params(start.get_cur_url())['selfPayOrderId']})
             assert start.is_visibility(pay) and start.get_text(pay) == U'支付成功', log.error(U'支付失败')
         with allure.step(U'确认油品信息'):
             # 油枪单价
             TestSelfPay.tmp.update(start.pay_oil_info())
             print(TestSelfPay.tmp)
+            print(member_info)
