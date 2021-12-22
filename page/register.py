@@ -9,12 +9,12 @@ from common.custom import request
 from common import log
 from common.db_mysql import DB_sql
 from page import page_base
-import re
-from  time import sleep
-from base import driver
-from common import custom
+
+from time import sleep
+
 
 logger = log.Logger()
+
 
 class Register(page_base.Base):
     Element = yaml_handle.element_page(U'注册')
@@ -25,8 +25,8 @@ class Register(page_base.Base):
     def input_name(self, name):
         self.input_text(('xpath', self.Element[U'会员名']), name)
 
-    def input_phone(self, phoneNum):
-        self.input_text(('xpath', self.Element[U'手机号']), phoneNum)
+    def input_phone(self, phone_num):
+        self.input_text(('xpath', self.Element[U'手机号']), phone_num)
 
     def get_code(self, code_url, pars):
         try:
@@ -37,28 +37,25 @@ class Register(page_base.Base):
         else:
             if re.json()['msg'] == U'操作成功' and re.json()['success'] is True:
                 sleep(0.5)
-                sql = "SELECT `CODE` FROM weixin.verification_code where PHONE_NUM = {} ORDER BY SENT_TIME desc LIMIT 1".format(yaml_handle.case_data[u'手机号'])
+                sql = "SELECT `CODE` FROM weixin.verification_code where PHONE_NUM = {} ORDER BY SENT_TIME desc LIMIT 1".format(
+                    yaml_handle.case_data[u'手机号'])
                 result = DB_sql().select_db(sql=sql)
                 return result['CODE']
             else:
                 logger.info('一分钟内不能再发送 or 发送短信达到阀值')
 
-    def input_code(self,code):
+    def input_code(self, code):
         self.input_text(('xpath', self.Element[u'验证码']), code)
 
-    def choice_station(self,stationName):
+    def choice_station(self, station_name):
         self.click(('xpath', self.Element[U'选择油站']))
-        element = self.browser.find_element(By.XPATH,'//div/p[text()={}]'.format('\''+stationName + '\''))
+        element = self.browser.find_element(By.XPATH, '//div/p[text()={}]'.format('\'' + station_name + '\''))
         try:
             self.browser.execute_script("arguments[0].scrollIntoView();", element)
         except Exception as e:
-            log.info(U'滚动页面失败, {}'.format(e))
+            logger.info(U'滚动页面失败, {}'.format(e))
         element.click()
 
     def submit(self):
         self.click(('xpath', self.Element[u'确认提交']))
 
-# if __name__ == "__main__":
-#     ch = driver.chrome()
-#     r = Register(ch)
-#     print(r.Element)

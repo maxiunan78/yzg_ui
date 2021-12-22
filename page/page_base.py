@@ -70,23 +70,28 @@ class Base(object):
         except Exception as msg:
             logger.error("Error:{}".format(msg))
 
-    def find_element(self, locator, timeout=5):
+    def find_element(self, locator, visibility=True, timeout=5):
         """
         查找唯一元素
+        :param visibility: 元素是否可见
         :param locator: 元素
         :param timeout: 查询时间
         :return: 元素 或 错误
         """
         try:
-            self.explicit_wait(timeout, 0.5) \
-                .until(EC.visibility_of_element_located(element_locator(locator)))
             by, value = element_locator(locator)
+            if visibility:
+                self.explicit_wait(timeout, 0.5) \
+                    .until(EC.visibility_of_element_located(element_locator(locator)))
+            else:
+                self.explicit_wait(timeout, 0.5)\
+                    .until(EC.presence_of_element_located(element_locator(locator)))
             element = self.browser.find_element(by, value)
             return element
         except Exception as msg:
             logger.error(U'页面元素不存在或不可见, {}'.format(msg), 5)
 
-    def find_elements(self, locator, timeout=5):
+    def find_elements(self, locator, visibility=True, timeout=5):
         """
         查找元素列表
 
@@ -95,9 +100,13 @@ class Base(object):
         :return: 元素 或 错误
         """
         try:
-            self.explicit_wait(timeout, 0.5) \
-                .until(EC.visibility_of_all_elements_located(element_locator(locator)))
             by, value = element_locator(locator)
+            if visibility:
+                self.explicit_wait(timeout, 0.5) \
+                    .until(EC.visibility_of_all_elements_located(element_locator(locator)))
+            else:
+                self.explicit_wait(timeout, 0.5) \
+                    .until(EC.presence_of_all_elements_located(element_locator(locator)))
             elements = self.browser.find_elements(by, value)
             return elements
         except Exception as msg:
@@ -214,7 +223,7 @@ class Base(object):
         :param locator: 元素
         """
         try:
-            element = self.find_element(locator)
+            element = self.find_element(locator, visibility=False)
             self.browser.execute_script("arguments[0].scrollIntoView();", element)
         except Exception as msg:
             logger.error(U'滚动页面失败, {}'.format(msg), 5)
