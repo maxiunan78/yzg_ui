@@ -9,68 +9,87 @@
 import queue
 
 from common.db_mysql import DB_sql
-import yaml_handle
+from base import yaml_handle
 
 db = DB_sql()
-
-
-def get_member(member_id=yaml_handle.param_value('memberId')):
-    member_info = {}
-    member = db.select_db(column='HQ_MEMBER_GRADE_ID,HQ_ID,MEMBER_ID,MEMBER_NAME,PHONE_NUM,HQ_MEMBER_GRADE_NAME',
-                          table='crm.member', where=f'MEMBER_ID = {member_id}')
-    member_info.update(member)
-    member_account = db.select_db(column='AMOUNT, POINT',
-                                  table='crm.member_account', where=f'MEMBER_ID = {member_id}')
-    member_info.update(member_account)
-    grade_type = db.select_db(column='GRADE_TYPE', table='erp_hq.member_grade_config',
-                              where=f'ID = {member["HQ_MEMBER_GRADE_ID"]}')
-
-    v, = grade_type.values()
-    if v != 0:
-        upgrade_value = db.select_db(column='MEMBER_UPGRADE_VALUE', table='crm.member_grade',
-                                     where=f'MEMBER_ID = {member_id}')
-
-        member_info.update(upgrade_value)
-    return member_info
-# 传参  用例数据
-fp_name = '95#汽油'
-
 
 
 class Precondition:
     # 会员信息  积分，优惠，成长值规则 站点油品油枪 条件通过读取配置判断
     def __init__(self):
-        self.member_info = get_member()
+        self.member_info = Precondition.get_member()
+        self.oil = Precondition.fp_info(yaml_handle.case_data[u'油枪选择'])
         self.grade_info = self.grade_config()
-        self.oil = fp_name
+        self.hq_func_config = db.select_db(column='*', table='erp_hq.hq_function_config',
+                                           where=f'HQ_ID={self.member_info["HQ_ID"]}')
 
-    @property
-    def get_member_info(self):
-        return self.member_info
+    @staticmethod
+    def get_member(member_id=yaml_handle.param_value('memberId')):
+        """
+        获取会员基本信息
+        :param member_id: 会员ID
+        :return: 会员信息 （会员ID 总部ID 等级ID 会员姓名 手机号 等级名称 等级类型 成长值 积分 余额 ）
+        """
+        member_info = {}
+        member = db.select_db(column='HQ_MEMBER_GRADE_ID,HQ_ID,MEMBER_ID,MEMBER_NAME,PHONE_NUM,HQ_MEMBER_GRADE_NAME',
+                              table='crm.member', where=f'MEMBER_ID = {member_id}')
+        member_info.update(member)
+        member_account = db.select_db(column='AMOUNT, POINT',
+                                      table='crm.member_account', where=f'MEMBER_ID = {member_id}')
+        member_info.update(member_account)
+        grade_type = db.select_db(column='GRADE_TYPE', table='erp_hq.member_grade_config',
+                                  where=f'ID = {member["HQ_MEMBER_GRADE_ID"]}')
+        member_info.update(grade_type)
+        v, = grade_type.values()
+        if v != 0:
+            upgrade_value = db.select_db(column='MEMBER_UPGRADE_VALUE', table='crm.member_grade',
+                                         where=f'MEMBER_ID = {member_id}')
+
+            member_info.update(upgrade_value)
+        return member_info
+
+    # 传参  用例数据
+    @staticmethod
+    def fp_info(num):
+        """
+        根据用例参数，获取站点下油枪信息
+        :param num: 油枪号
+        :return: 油枪信息 （油枪号，价格，油品名称）
+        """
+        fp = db.select_db(column='FP_NO,PR_NAME,PRICE', table='erp_station.fp_monitor_history',
+                          where=f'STATION_ID = {yaml_handle.param_value("stationId")} and FP_NO = {num}')
+        return fp
 
     def grade_config(self):
+        """
+        获取 等级优惠 积分 成长值 基本信息
+        :return: 等级优惠 积分 成长值 基本信息
+        """
         grade_id = self.member_info['HQ_MEMBER_GRADE_ID']
         grade_type = self.member_info['GRADE_TYPE']
         hq_id = self.member_info['HQ_ID']
         station_id = yaml_handle.param_value('stationId')
+        fp_name = self.oil['PR_NAME']
         station_adv_task = db.select_db(column='advanced.SALE_AMOUNT,advanced.POINT',
                                         table='erp_station.`grade_pr_advanced_config` AS advanced',
-                                        join='INNER JOIN (SELECT discount.ID, discount.REF_CONFIG_ID,startion.USABLE_STATION_IDS,startion.RULE_TYPE'
+                                        join='INNER JOIN (SELECT discount.ID, discount.REF_CONFIG_ID,'
+                                             'station.USABLE_STATION_IDS,station.RULE_TYPE '
                                              ' FROM erp_station.grade_discount_config AS discount '
-                                             'INNER JOIN erp_station.station_grade_config AS startion ON discount.REF_CONFIG_ID = startion.ID '
+                                             'INNER JOIN erp_station.station_grade_config AS station ON '
+                                             'discount.REF_CONFIG_ID = station.ID '
                                              ') AS discount ON advanced.REF_ID = discount.ID ',
-                                        where=f'advanced.GRADE_ID = {grade_id} '
-                                              f'AND advanced.PR_NAME = "{fp_name}" '
-                                              f'AND discount.USABLE_STATION_IDS LIKE "%{station_id}%"'
-                                              f'AND advanced.HQ_ID = {hq_id}')
+                                        where=f'GRADE_ID = {grade_id} '
+                                              f'AND PR_NAME = "{fp_name}" '
+                                              f'AND FIND_IN_SET({station_id},USABLE_STATION_IDS)'
+                                              f'AND HQ_ID = {hq_id}')
 
         station_task = db.select_db(
             column='discount.GAS_POINT,discount.SALE_AMOUNT,discount.DIESEL_POINT,discount.DIESEL_SALE_AMOUNT',
             table='erp_station.grade_discount_config AS discount',
-            join='INNER JOIN erp_station.station_grade_config AS startion ON discount.REF_CONFIG_ID = startion.ID ',
-            where=f' discount.GRADE_ID = {grade_id} '
-                  f'AND startion.USABLE_STATION_IDS LIKE "%{station_id}%"'
-                  f'AND discount.HQ_ID = {hq_id}')
+            join='INNER JOIN erp_station.station_grade_config AS station ON discount.REF_CONFIG_ID = station.ID ',
+            where=f' GRADE_ID = {grade_id} '
+                  f'AND FIND_IN_SET({station_id},USABLE_STATION_IDS)'
+                  f'AND HQ_ID = {hq_id}')
         grade_adv_task = db.select_db(
             column='SALE_AMOUNT,POINT',
             table='erp_hq.grade_pr_advanced_config',
@@ -92,14 +111,12 @@ class Precondition:
                 priority, value = member_grade
                 if value is not None:
                     member_grade.update({'DISCOUNT_TYPE': grade_task['DISCOUNT_TYPE']})
-                    print(member_grade)
                     return member_grade
         else:
             def grade_discount():
                 if station_adv_task is not None:
                     station_adv_task_copy = station_adv_task.copy()
                     station_adv_task_copy.pop('POINT')
-
                     qp.put((1, station_adv_task_copy))
                 elif station_task is not None:
                     station_task_copy = station_task.copy()
@@ -118,7 +135,6 @@ class Precondition:
                     dis_priority, dis_value = member_grade_discount
                     if dis_value is not None:
                         qp.queue.clear()
-                        print(member_grade_discount)
                         return member_grade_discount
 
             def grade_point():
@@ -141,7 +157,6 @@ class Precondition:
                     point_priority, point_value = member_grade_point
                     if point_value is not None:
                         qp.queue.clear()
-                        print(point_value)
                         return point_value
 
             member_grade = grade_discount()
@@ -150,25 +165,72 @@ class Precondition:
             member_grade[1].update(
                 {'GAS_UPGRADE': grade_task['GAS_UPGRADE'], 'DIESEL_UPGRADE': grade_task['DIESEL_UPGRADE'],
                  'DISCOUNT_TYPE': grade_task['DISCOUNT_TYPE']})
-            print(member_grade)
             return member_grade
 
     def grade_point_count(self, amount):
-        if self.grade_info[0] in (1, 3):
+        """
+        会员等级积分计算
+        :param amount: 计算值
+        :return:积分
+        """
+        amount = self.amount_form(amount)
+        amount = self.amount_form(amount)
+        if 'POINT' in self.grade_info[1]:
             return int(amount * self.grade_info[1]['POINT'])
-        elif self.grade_info[0] == 2:
+        else:
             if self.oil[-2:] == U'汽油':
                 return int(amount * self.grade_info[1]['GAS_POINT'])
             elif self.oil[-2:] == U'柴油':
                 return int(amount * self.grade_info[1]['DIESEL_POINT'])
-        else:
-            if self.oil[-2:] == U'汽油':
-                return int(amount * self.grade_info[1]['POINT'])
-            elif self.oil[-2:] == U'柴油':
-                return int(amount * self.grade_info[1]['DIESEL_POINT'])
 
     def upgrade_count(self, amount):
+        """
+        成长值计算
+        :param amount: 计算值
+        :return: 成长值
+        """
+        amount = self.amount_form(amount)
         if self.oil[-2:] == U'汽油':
             return int(amount * self.grade_info[1]['GAS_UPGRADE'])
         elif self.oil[-2:] == U'柴油':
             return int(amount * self.grade_info[1]['DIESEL_UPGRADE'])
+
+    # 未做优惠 暂时先获取元素 进行计算
+    def amount_form(self, amount):
+        flag = self.hq_func_config['UPGRADE_POINT_CALCULATE_TYPE']
+        if flag == 0:
+            return amount[U'支付金额']
+        else:
+            lites = f' {yaml_handle.case_data[U"金额"] / self.oil["PRICE"]:0.2f}'
+            if yaml_handle.case_data[U"金额"] / self.oil["PRICE"] == 0:
+                return float(lites)
+            else:
+                return float(lites) + 0.01
+
+    def get_grade_point(self, amount):
+        count = self.grade_point_count(amount)
+        if self.member_info['GRADE_TYPE'] != 0:
+            count = self.hq_func_config['IS_UPGRADE_POINT'] == 1 and count or 0
+            return count
+        else:
+            return count
+
+    def get_upgrade_value(self, amount):
+        count = self.upgrade_count(amount)
+        if self.hq_func_config['IS_BALANCE_PAY'] == 0 and self.hq_func_config['ORDER_MIN_AMOUNT'] < amount[U'支付金额']:
+            if self.get_upgrade_additional() == int(self.hq_func_config['MONTH_RECHARGE_COUNT']) + 1:
+                return count + 4
+            else:
+                return count
+        else:
+            return 0
+
+    def get_upgrade_additional(self):
+        table = db.select_db(column='table_name', table='data_dict.table_config', where='FIND_IN_SET(16548,hq_ids)')
+        table, = table.values()
+        record = db.select_db(False, table=f'trade.2019_{table}',
+                              where=f'HQ_ID = {self.member_info["HQ_ID"]} and '
+                                    f'MEMBER_ID ={self.member_info["MEMBER_ID"]} and '
+                                    f'RECEIVABLE_AMOUNT > {self.hq_func_config["MONTH_RECHARGE_AMOUNT"]} '
+                                    f' and  DATE_FORMAT( CREATED_TIME, "%Y%m" ) = DATE_FORMAT(CURDATE() , "%Y%m" )')
+        return len(record)

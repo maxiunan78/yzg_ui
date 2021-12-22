@@ -67,5 +67,5 @@ def pytest_runtest_makereport():
 
 @pytest.fixture(scope='class')
 def member_info():
-    member_info = Precondition.get_member_info
+    member_info = Precondition.get_member()
     return member_info
