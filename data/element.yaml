@@ -40,3 +40,12 @@
   '订单金额': '/html/body/div/section/div[1]/div[2]'
    # 读取油品信息
   '订单油品信息': '/html/body/div/section/div[2]/div'
+
+#注册页面元素
+'注册':
+  '会员名': '//*[@id="app"]/section/div[1]/section/div[1]/input'
+  '手机号': '//*[@id="app"]/section/div[1]/section/div[2]/input'
+  '验证码': '//*[@id="app"]/section/div[1]/section/div[3]/div[1]/input'
+  '选择油站': '//*[@id="app"]/section/div[1]/section/div[5]/input'
+  '确认提交': '//*[@id="app"]/section/footer/button'
+  '验证码输入框': '//*[@id="app"]/section/div[1]/section/div[3]/div[1]/input'
