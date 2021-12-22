@@ -67,7 +67,7 @@ res = request.request(method="POST", url=code_url, params=pars)
 if res.json()['msg'] == U'操作成功' and res.json()['success'] is True:
     time.sleep(0.5)
 else:
-    print('一分钟内')
+    print('一分钟内不能再发送 or 发送短信达到阀值')
 
 # 数据库查询 需要封装读取
 sql = r"SELECT `CODE` FROM weixin.verification_code where PHONE_NUM = '15519036084' ORDER BY SENT_TIME desc LIMIT 1"
