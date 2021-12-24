@@ -76,5 +76,4 @@ class TestRegister:
             assert result is not None, log.info("注册失败")
 
 
-if __name__ == "__main__":
-    pytest.main(['test_register.py'])
+
