@@ -15,6 +15,7 @@ from selenium.webdriver import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 
+from base import driver
 from common import log
 
 
@@ -39,7 +40,7 @@ if not os.path.exists(screenshot_path):
 
 
 class Base(object):
-    def __init__(self, browser):
+    def __init__(self, browser=driver.chrome()):
         self.browser = browser
         self.implicitly_wait(5)
         self.max()
@@ -84,7 +85,7 @@ class Base(object):
                 self.explicit_wait(timeout, 0.5) \
                     .until(EC.visibility_of_element_located(element_locator(locator)))
             else:
-                self.explicit_wait(timeout, 0.5)\
+                self.explicit_wait(timeout, 0.5) \
                     .until(EC.presence_of_element_located(element_locator(locator)))
             element = self.browser.find_element(by, value)
             return element
@@ -249,3 +250,29 @@ class Base(object):
         filename = f.split('\\')[-1]
         allure.attach.file(f, U'失败用例截图:{}'.format(filename), allure.attachment_type.PNG)
         time.sleep(0.5)
+
+    def get_cookies(self):
+        """
+        获得cookies
+        :return:
+        """
+        return self.browser.get_cookies()
+
+    def del_all_cookies(self):
+        """
+        删除cookies
+        :return:
+        """
+        return self.browser.delete_all_cookies()
+
+    def add_cookies(self, cookies):
+        """
+        添加cookies
+        :param cookies:
+        :return:
+        """
+        if type(cookies) == dict:
+            self.browser.add_cookie(cookies)
+        else:
+            for cookie in cookies:
+                self.browser.add_cookie(cookie)
