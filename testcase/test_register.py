@@ -57,7 +57,6 @@ class TestRegister:
             # assert start.find_element(('xpath',start.Element[u'验证码输入框'])).get_attribute("data-index") == code
 
         with allure.step(u'选择站点'):
-            pars = yaml_handle.param_value('pars')
             sql = "SELECT station_name FROM erp_station.station WHERE STATION_ID={}".format(
                 yaml_handle.param_value('stationId'))
             result = DB_sql().select_db(sql=sql)
