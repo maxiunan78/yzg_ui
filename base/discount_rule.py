@@ -8,6 +8,7 @@
 """
 from common.db_mysql import DB_sql
 from base.preconditions import Precondition
+from common.interface import Openapi
 
 db = DB_sql()
 precondition = Precondition()
@@ -17,6 +18,7 @@ class Discount:
     def __init__(self, fp_no, amount):
         self.member_info = precondition.member_info
         self.oil = precondition.fp_info(fp_no)
+        self.station_id = precondition.station_id
         self.amount = amount
         self.hq_func_config = db.select_db(column='*', table='erp_hq.hq_function_config',
                                            where=f'HQ_ID={self.member_info["HQ_ID"]}')
@@ -49,11 +51,15 @@ class Discount:
         elif self.oil['PR_NAME'][-2:] == U'柴油':
             return int(amount * self.grade_info[1]['DIESEL_UPGRADE'])
 
-    # 未做优惠 暂时先获取元素 进行计算  后续传入应付金额
     def amount_form(self, amount):
+        """
+        会员加油积分、成长值计算方式  0:按加油实收金额计算;1:按加油实际升数计算
+        :param amount: 支付金额
+        :return:
+        """
         flag = self.hq_func_config['UPGRADE_POINT_CALCULATE_TYPE']
         if flag == 0:
-            return amount[U'支付金额']
+            return amount
         else:
             return self.oil_liters()
 
@@ -67,7 +73,7 @@ class Discount:
 
     def get_grade_point(self, amount):
         """
-        获取会员积分
+        获取会员积分  判断规则（成长性会员支不支持积分）
         :param amount: 金额或升数
         :return:积分
         """
@@ -80,7 +86,7 @@ class Discount:
 
     def get_upgrade_value(self, amount):
         """
-        获取成长值
+        获取成长值 判断规则（获取的条件和奖励）
         :param amount: 金额或升数
         :return: 成长值
         """
@@ -98,7 +104,8 @@ class Discount:
         获取满足附加成长值的次数
         :return: 次数
         """
-        table = db.select_db(column='table_name', table='data_dict.table_config', where='FIND_IN_SET(16548,hq_ids)')
+        table = db.select_db(column='table_name', table='data_dict.table_config',
+                             where=f'FIND_IN_SET({self.member_info["HQ_ID"]},hq_ids)')
         table, = table.values()
         record = db.select_db(False, table=f'trade.2019_{table}',
                               where=f'HQ_ID = {self.member_info["HQ_ID"]} and '
@@ -108,6 +115,11 @@ class Discount:
         return len(record)
 
     def grade_discount_type(self, discount):
+        """
+        会员优惠类型 DISCOUNT_TYPE 1.折扣 2.直降
+        :param discount:
+        :return:
+        """
         if self.grade_info[1]['DISCOUNT_TYPE'] == 1:
             discount = int(discount / 100 * float(self.oil["PRICE"]) * 100) / 100
             return discount
@@ -138,5 +150,4 @@ class Discount:
             return float(f'{self.grade_descent_count():0.2f}')
         else:
             return 0
-
 
