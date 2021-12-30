@@ -57,7 +57,7 @@ class Precondition:
                           where=f'STATION_ID = {self.station_id} and FP_NO = {num}')
         return fp
 
-    def grade_config(self, fp_name):
+    def grade_config(self, fp_name: str):
         """
         获取 等级优惠 积分 成长值 基本信息
         :return: 等级优惠 积分 成长值 基本信息
@@ -80,7 +80,8 @@ class Precondition:
                                               f'AND advanced.HQ_ID = {hq_id}')
 
         station_task = db.select_db(
-            column='discount.GAS_POINT,discount.SALE_AMOUNT,discount.DIESEL_POINT,discount.DIESEL_SALE_AMOUNT',
+            column='discount.GAS_POINT,discount.SALE_AMOUNT,discount.DIESEL_POINT,'
+                   'discount.DIESEL_SALE_AMOUNT,discount.DISCOUNT_TYPE,discount.MIN_FUEL_AMOUNT',
             table='erp_station.grade_discount_config AS discount',
             join='INNER JOIN erp_station.station_grade_config AS station ON discount.REF_CONFIG_ID = station.ID ',
             where=f' GRADE_ID = {grade_id} '
@@ -89,12 +90,12 @@ class Precondition:
         grade_adv_task = db.select_db(
             column='SALE_AMOUNT,POINT',
             table='erp_hq.grade_pr_advanced_config',
-            where=f'GRADE_ID = {grade_id} and HQ_ID = {hq_id} and PR_NAME = {fp_name}'
+            where=f'GRADE_ID = {grade_id} and HQ_ID={hq_id} and PR_NAME = {fp_name}'
         )
         grade_task = db.select_db(column='SALE_AMOUNT,DIESEL_SALE_AMOUNT,POINT,DIESEL_POINT,DISCOUNT_TYPE,GAS_UPGRADE,'
-                                         'DIESEL_UPGRADE',
+                                         'DIESEL_UPGRADE,MIN_CONSUME_AMOUNT',
                                   table='erp_hq.member_grade_config',
-                                  where=f'ID = {grade_id} and HQ_ID = {hq_id} ')
+                                  where=f'ID = {grade_id} and HQ_ID={hq_id} ')
         qp = queue.PriorityQueue()
         if grade_type == 0:
             qp.put((1, station_adv_task))
@@ -105,8 +106,15 @@ class Precondition:
             while not qp.empty():
                 member_grade = qp.get()
                 priority, value = member_grade
-                if value is not None:
-                    member_grade.update({'DISCOUNT_TYPE': grade_task['DISCOUNT_TYPE']})
+                if value is not None and priority in (1, 2):
+                    member_grade[1].update({'DISCOUNT_TYPE': station_task['DISCOUNT_TYPE'],
+                                            'MIN_FUEL_AMOUNT': station_task['MIN_FUEL_AMOUNT']
+                                            })
+                    return member_grade
+                elif value is not None and priority in (3, 4):
+                    member_grade[1].update({'DISCOUNT_TYPE': grade_task['DISCOUNT_TYPE'],
+                                            'MIN_CONSUME_AMOUNT': grade_task['MIN_CONSUME_AMOUNT']
+                                            })
                     return member_grade
         else:
             def grade_discount():
@@ -124,13 +132,18 @@ class Precondition:
                     qp.put((3, grade_adv_task_copy))
                 grade_task_copy = grade_task.copy()
                 [grade_task_copy.pop(k) for k in
-                 ['GAS_UPGRADE', 'DIESEL_UPGRADE', 'POINT', 'DISCOUNT_TYPE', 'DIESEL_POINT']]
+                 ['GAS_UPGRADE', 'DIESEL_UPGRADE', 'POINT', 'DIESEL_POINT']]
                 qp.put((4, grade_task_copy))
                 while not qp.empty():
                     member_grade_discount = qp.get()
                     dis_priority, dis_value = member_grade_discount
-                    if dis_value is not None:
+                    if dis_value is not None and dis_priority in (1, 2):
                         qp.queue.clear()
+                        member_grade_discount[1].update({'DISCOUNT_TYPE': station_task['DISCOUNT_TYPE']})
+                        return member_grade_discount
+                    elif dis_value is not None and dis_priority in (3, 4):
+                        qp.queue.clear()
+                        member_grade_discount[1].update({'DISCOUNT_TYPE': grade_task['DISCOUNT_TYPE']})
                         return member_grade_discount
 
             def grade_point():
@@ -159,6 +172,5 @@ class Precondition:
 
             member_grade[1].update(grade_point())
             member_grade[1].update(
-                {'GAS_UPGRADE': grade_task['GAS_UPGRADE'], 'DIESEL_UPGRADE': grade_task['DIESEL_UPGRADE'],
-                 'DISCOUNT_TYPE': grade_task['DISCOUNT_TYPE']})
+                {'GAS_UPGRADE': grade_task['GAS_UPGRADE'], 'DIESEL_UPGRADE': grade_task['DIESEL_UPGRADE']})
             return member_grade

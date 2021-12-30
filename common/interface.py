@@ -17,13 +17,18 @@ class Openapi:
     def __init__(self, url=yaml_handle.param_value('openapiurl')):
         self.url = url
 
-    def now_time(self):
+    def now_time(self, flag: bool = True):
         conn = custom.request('GET', url=self.url)
         ltime = time.strptime(conn.headers['Date'][5:25], "%d %b %Y %H:%M:%S")
         ttime = time.localtime(time.mktime(ltime) + 8 * 60 * 60)
         now_time = f'{ttime.tm_year:}-{ttime.tm_mon:0>2d}-{ttime.tm_mday:0>2d} ' \
                    f'{ttime.tm_hour:0>2d}:{ttime.tm_min:0>2d}:{ttime.tm_sec:0>2d} '
-        return now_time
+        if flag:
+            return now_time
+        else:
+            week = ttime.tm_wday + 1
+            mday = ttime.tm_mday
+            return week, mday
 
     @staticmethod
     def open_api_autograph(body: dict):
