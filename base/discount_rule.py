@@ -33,8 +33,13 @@ class Discount:
         :return:积分
         """
         amount = self.amount_form(amount)
-        if 'POINT' in self.grade_info[1]:
+        if 'POINT' in self.grade_info[1] and 'DIESEL_POINT' not in self.grade_info[1]:
             return int(amount * self.grade_info[1]['POINT'])
+        elif 'POINT' in self.grade_info[1] and 'DIESEL_POINT' in self.grade_info[1]:
+            if self.oil['PR_NAME'][-2:] == U'汽油':
+                return int(amount * self.grade_info[1]['POINT'])
+            elif self.oil['PR_NAME'][-2:] == U'柴油':
+                return int(amount * self.grade_info[1]['DIESEL_POINT'])
         else:
             if self.oil['PR_NAME'][-2:] == U'汽油':
                 return int(amount * self.grade_info[1]['GAS_POINT'])
@@ -70,8 +75,13 @@ class Discount:
         获取油品升数
         :return:
         """
-        lites = int((self.amount / self.oil["PRICE"]) * 100 + 1) / 100
-        return float(lites)
+        digit = str(self.amount / float(self.oil["PRICE"])).split('.')[1]
+        if len(digit) >= 3:
+            lites = int((self.amount / float(self.oil["PRICE"])) * 100 + 1) / 100
+            return float(lites)
+        else:
+            lites = self.amount / float(self.oil["PRICE"])
+            return float(lites)
 
     def get_grade_point(self, amount):
         """
@@ -113,6 +123,7 @@ class Discount:
                               where=f'HQ_ID = {self.member_info["HQ_ID"]} and '
                                     f'MEMBER_ID ={self.member_info["MEMBER_ID"]} and '
                                     f'RECEIVABLE_AMOUNT > {self.hq_func_config["MONTH_RECHARGE_AMOUNT"]} '
+                                    f' and PAY_STATUS = 1'
                                     f' and  DATE_FORMAT( CREATED_TIME, "%Y%m" ) = DATE_FORMAT(CURDATE() , "%Y%m" )')
         return len(record)
 
@@ -212,3 +223,109 @@ class Discount:
             return discount_amount[-1]
         else:
             return 0
+
+    def special_activity_count(self):
+        activity = db.select_db(False, sql="SELECT * FROM `marketing`.`activity` WHERE `TYPE` = '64' AND `STATUS` = '1'"
+                                           f" and HQ_ID ={self.member_info['HQ_ID']}")
+        activity_copy = list(activity)
+        times = Openapi().now_time().split(' ')[1]
+        wday, mday = Openapi().now_time(False)
+
+        for i in activity_copy:
+            if i['IS_ALL_GRADES'] == 0:
+                if str(self.member_info['HQ_MEMBER_GRADE_ID']) not in i['USABLE_GRADE_IDS']:
+                    activity.remove(i)
+                    continue
+            if self.amount < float(i['MIN_FUEL_AMOUNT']):
+                activity.remove(i)
+                continue
+            if i['IS_ALL_STATIONS'] == 0:
+                if str(self.station_id) not in i['USABLE_STATION_IDS']:
+                    activity.remove(i)
+                    continue
+            if i['IS_ALL_PRS'] == 0:
+                if self.oil['PR_NAME'] not in i['USABLE_PR_NAMES']:
+                    activity.remove(i)
+                    continue
+            if i['USABLE_WEEK'] is not None and str(wday) not in i['USABLE_WEEK']:
+                activity.remove(i)
+                continue
+            elif i['USABLE_DAYS'] is not None and str(mday) not in i['USABLE_DAYS']:
+                activity.remove(i)
+                continue
+            if i['CONDITION_VALUE_3'] not in ('', None):
+                time_scope = i['CONDITION_VALUE_3'].split(',')
+                temp = []
+                for scope in time_scope:
+                    time_start, time_end = scope.split('-')
+                    if time.strptime(time_start, '%H:%M:%S') <= time.strptime(times, '%H:%M:%S') <= time.strptime(
+                            time_end, '%H:%M:%S'):
+                        temp.append(1)
+                    else:
+                        temp.append(0)
+                if 1 not in temp:
+                    activity.remove(i)
+        if len(activity) <= 0:
+            return 0
+        else:
+            activity_amt = 0
+            # 目前因优惠互斥 存在问题  未进行判断
+            grade_type = 0
+            for dis_activity in activity:
+                if dis_activity['ENJOY_MEMBER_GRADE_DIS'] == 1:
+                    grade_type = 1
+                activity_amt = float(activity_amt) + float(dis_activity['CONDITION_VALUE_4'])
+            activity_amt = self.hq_func_config['SPECIAL_DISCOUNT'] in (1, 0) and float(
+                f'{activity_amt * self.oil_liters():0.2f}') or 0
+            return grade_type, activity_amt
+
+    @staticmethod
+    def times_scope(time_scopes: str):
+        times = Openapi().now_time().split(' ')[1]
+
+        flag = False
+        if time_scopes is not ('' or None):
+            time_scopes = time_scopes.split(',')
+            for scope in time_scopes:
+                time_start, time_end = scope.split('-')
+                if time.strptime(time_start, '%H:%M:%S') <= time.strptime(times, '%H:%M:%S') <= time.strptime(
+                        time_end, '%H:%M:%S'):
+                    flag = True
+        return flag
+
+    def coupon(self):
+        times = Openapi().now_time().split(' ')
+        wday, mday = Openapi().now_time(False)
+        flag = False
+        if self.hq_func_config['CAN_USE_CASH_COUPON'] == 1:
+            if self.hq_func_config['IS_ALLOWED_USE_COUPON'] == 0 and \
+                    time.strptime(str(self.hq_func_config['COUPON_LIMIT_START_TIME']), '%Y-%m-%d') \
+                    <= time.strptime(times[0], '%Y-%m-%d') <= time.strptime(
+                str(self.hq_func_config['COUPON_LIMIT_END_TIME']), '%Y-%m-%d'):
+                flag = self.times_scope(self.hq_func_config['TIME_SCOPE'])
+            elif self.hq_func_config['IS_ALLOWED_USE_COUPON'] == 2:
+                if str(mday) in self.hq_func_config['DATE_SCOPE']:
+                    flag = self.times_scope(self.hq_func_config['TIME_SCOPE'])
+            elif self.hq_func_config['IS_ALLOWED_USE_COUPON'] == 3:
+                if str(wday) in self.hq_func_config['DATE_SCOPE']:
+                    flag = self.times_scope(self.hq_func_config['TIME_SCOPE'])
+
+            if not flag:
+                return self.coupon_amount()
+            else:
+                return 0
+
+        else:
+            return 0
+
+    def total_discount(self):
+        grade = float(self.get_discount_grade())
+        coupon = float(self.coupon())
+        grade_act_type, activity_amt = self.special_activity_count()
+
+        if grade_act_type == 0:
+            return (grade < activity_amt and activity_amt or grade) + coupon
+        else:
+
+            return grade + activity_amt + coupon
+

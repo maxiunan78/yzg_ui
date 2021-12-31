@@ -155,6 +155,38 @@ class OilServer:
         res = custom.request('POST', url=url, params=params, headers=header, cookies=self.cookie)
         return res.status_code == 200 and res or None
 
+    def coupon_time(self, isAllowedUseCoupon=1, couponLimitStartTime='', couponLimitEndTime='', dateScope='',
+                    timeScope=''):
+        """
+        会员优惠券 设置时间
+        :return:
+        """
+        url = custom.post_params(self.url, path='/memberUp/setHqCouponConfig')
+        header = {
+            'content-type': 'application/x-www-form-urlencoded;charset=UTF-8'
+        }
+        if timeScope == '':
+            isWholeDay = 1
+        else:
+            isWholeDay = 2
+
+        params = dict(
+            # 会员代金券是否可用以及不可用类型,1-可用,0-指定日期段不可用,2-每月指定每月X日不可用,3-指定每周周X不可用
+            isAllowedUseCoupon=isAllowedUseCoupon,
+            # 使用时间段的类型 1.全天 2.部分时间段
+            isWholeDay=isWholeDay,
+            # 时间天数  如 2021-12-31
+            couponLimitStartTime=couponLimitStartTime,
+            couponLimitEndTime=couponLimitEndTime,
+            # 指定周几 或每月几号
+            dateScope=dateScope,
+            # 时间段 如00:00:00-08:00:00,09:00:00-14:00:00 至多两个
+            timeScope=timeScope,
+            consumeRecordTimeLimit=360
+        )
+        res = custom.request('POST', url=url, params=params, headers=header, cookies=self.cookie)
+        return res.status_code == 200 and res or None
+
     def growup_config(self, orderMinAmount=0, orderUpgradeScale=6,
                       orderUpgradeScaleDoor=10, monthRechargeCount=2, monthRechargeAmount=3, monthAddValue=4,
                       isPlancePay=0):
