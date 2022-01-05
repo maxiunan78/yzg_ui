@@ -40,7 +40,7 @@ if not os.path.exists(screenshot_path):
 
 
 class Base(object):
-    def __init__(self, browser=driver.chrome()):
+    def __init__(self, browser):
         self.browser = browser
         self.implicitly_wait(5)
         self.max()
@@ -96,6 +96,7 @@ class Base(object):
         """
         查找元素列表
 
+        :param visibility: 可见
         :param locator: 元素
         :param timeout: 查询时间
         :return: 元素 或 错误

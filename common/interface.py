@@ -96,8 +96,7 @@ class OilServer:
     def get_config(self):
         url = custom.post_params(self.url, path='/memberUp/getGrowupConfig')
         res = custom.request('POST', url=url, cookies=self.cookie)
-        if res.status_code == 200:
-            return res
+        return res.status_code == 200 and res or None
 
     def set_config(self, canUseCashCoupon=1, isBalabceDiscount=1, privilegeType=1,
                    specialDiscountType=1, upgradePointCalculateType=0, useGradeOrSpecialDisAmt=2):

@@ -29,7 +29,7 @@
 
   #待支付页
   '待支付油品': '/html/body/div/header/div/div[2]/span[2]'
-  '待支付订单金额': '/html/body/div/section/div[1]/div/div/div/div[1]/div[2]/span'
+  '支付订单金额': '/html/body/div/section/div[1]/div/div/div/div[1]/div[2]/span'
   '优惠金额': '//*[@id="totalDiscount"]'
   '待支付金额': '//*[@id="payAmt2"]'
   '确认支付': '/html/body/div/footer/div/div[2]/span'
@@ -49,3 +49,11 @@
   '选择油站': '//*[@id="app"]/section/div[1]/section/div[5]/input'
   '确认提交': '//*[@id="app"]/section/footer/button'
   '验证码输入框': '//*[@id="app"]/section/div[1]/section/div[3]/div[1]/input'
+
+# 个人中心
+'个人中心':
+  '数据加载': '//*[@id="list_loading"]'
+  '消费记录': '//*[@class="weui-grid consumeRecordPage"]'
+
+# 消费记录
+'消费记录' :

@@ -2,11 +2,12 @@
 # 初始的url 环境
 'url': 'https://wx.test.youzhanguanjia.com'
 'openapiurl': 'https://openapi.test.youzhanguanjia.com'
-'oilserverurl': 'https://openapi.test.youzhanguanjia.com'
+'oilserverurl': 'https://oilserver.test.youzhanguanjia.com'
 
 #接口路径
 'selftopay' : '/portal/selfPay/toSelfPay'
 'memberregister' : '/web/indexV9.2.html?version=V9.2#/memberRegister'
+'center': '/portal/member/centerIndex?version=V9.2'
 
 #get url中需要的参数
 #公用参数

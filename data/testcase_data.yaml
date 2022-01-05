@@ -1,6 +1,21 @@
 # 自助买单
 油枪选择: 1
 金额: 58
+'优惠设置':
+  -  'canUseCashCoupon:1':   #'使用余额支付时可以使用加油代金券'
+      canUseCashCoupon: 1
+      isBalabceDiscount: 1
+      privilegeType: 1
+      specialDiscountType: 1
+      upgradePointCalculateType: 0
+      useGradeOrSpecialDisAmt: 2
+#  -  # 使用余额支付时不可以使用加油代金券
+#        canUseCashCoupon: 0
+#        isBalabceDiscount: 1
+#        privilegeType: 1
+#        specialDiscountType: 1
+#        upgradePointCalculateType: 0
+#        useGradeOrSpecialDisAmt: 2
 # 会员注册
 会员名: '马锈南'
 手机号: 13882130978

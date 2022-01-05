@@ -7,6 +7,7 @@
 @Date    ：创建时间：2021/12/27 
 """
 import time
+from decimal import Decimal
 
 from common.db_mysql import DB_sql
 from base.preconditions import Precondition
@@ -53,12 +54,13 @@ class Discount:
         :return: 成长值
         """
         amount = self.amount_form(amount)
-        if self.oil['PR_NAME'][-2:] == U'汽油':
-            return int(amount * self.grade_info[1]['GAS_UPGRADE'])
-        elif self.oil['PR_NAME'][-2:] == U'柴油':
-            return int(amount * self.grade_info[1]['DIESEL_UPGRADE'])
 
-    def amount_form(self, amount):
+        if self.oil['PR_NAME'][-2:] == U'汽油':
+            return int(amount * float(self.grade_info[1]['GAS_UPGRADE']))
+        elif self.oil['PR_NAME'][-2:] == U'柴油':
+            return int(amount * float(self.grade_info[1]['DIESEL_UPGRADE']))
+
+    def amount_form(self, amount) -> float:
         """
         会员加油积分、成长值计算方式  0:按加油实收金额计算;1:按加油实际升数计算
         :param amount: 支付金额
@@ -66,22 +68,22 @@ class Discount:
         """
         flag = self.hq_func_config['UPGRADE_POINT_CALCULATE_TYPE']
         if flag == 0:
-            return amount
+            return float(amount)
         else:
-            return self.oil_liters()
+            return float(self.oil_liters())
 
-    def oil_liters(self):
+    def oil_liters(self) -> Decimal:
         """
         获取油品升数
         :return:
         """
-        digit = str(self.amount / float(self.oil["PRICE"])).split('.')[1]
+        digit = str(Decimal(self.amount) / Decimal(self.oil["PRICE"])).split('.')[1]
         if len(digit) >= 3:
-            lites = int((self.amount / float(self.oil["PRICE"])) * 100 + 1) / 100
-            return float(lites)
+            lites = int((Decimal(self.amount) / Decimal(self.oil["PRICE"])) * 100 + 1) / 100
+            return Decimal(f'{lites:0.2f}')
         else:
-            lites = self.amount / float(self.oil["PRICE"])
-            return float(lites)
+            lites = self.amount / Decimal(self.oil["PRICE"])
+            return Decimal(f'{lites:0.2f}')
 
     def get_grade_point(self, amount):
         """
@@ -130,44 +132,57 @@ class Discount:
     def grade_discount_type(self, discount):
         """
         会员优惠类型 DISCOUNT_TYPE 1.折扣 2.直降
-        :param discount:
+        :param discount: 优惠价格
         :return:
         """
         if self.grade_info[1]['DISCOUNT_TYPE'] == 1:
-            discount = int(discount / 100 * float(self.oil["PRICE"]) * 100) / 100
+            discount = int(Decimal(discount) / 100 * self.oil["PRICE"] * 100) / 100
             return discount
         else:
             return discount
 
     def grade_descent_count(self):
+        """
+        等级优惠判断计算
+        :return:
+        """
         if self.hq_func_config['MEMBER_GRADE_PRIVILEGE_TYPE'] == 0:
             if self.grade_info[0] in (1, 3):
-                return int(self.oil_liters()) * float(self.grade_discount_type(self.grade_info[1]['SALE_AMOUNT']))
+                return int(self.oil_liters()) * Decimal(self.grade_discount_type(self.grade_info[1]['SALE_AMOUNT']))
             else:
                 if self.oil['PR_NAME'][-2:] == U'汽油':
-                    return int(self.oil_liters()) * float(self.grade_discount_type(self.grade_info[1]['SALE_AMOUNT']))
+                    return int(self.oil_liters()) * Decimal(self.grade_discount_type(self.grade_info[1]['SALE_AMOUNT']))
                 elif self.oil['PR_NAME'][-2:] == U'柴油':
-                    return int(self.oil_liters()) * float(
+                    return int(self.oil_liters()) * Decimal(
                         self.grade_discount_type(self.grade_info[1]['DIESEL_SALE_AMOUNT']))
         else:
             if self.grade_info[0] in (1, 3):
-                return self.oil_liters() * float(self.grade_discount_type(self.grade_info[1]['SALE_AMOUNT']))
+                return self.oil_liters() * Decimal(self.grade_discount_type(self.grade_info[1]['SALE_AMOUNT']))
             else:
                 if self.oil['PR_NAME'][-2:] == U'汽油':
-                    return self.oil_liters() * float(self.grade_discount_type(self.grade_info[1]['SALE_AMOUNT']))
+                    return self.oil_liters() * Decimal(self.grade_discount_type(self.grade_info[1]['SALE_AMOUNT']))
                 elif self.oil['PR_NAME'][-2:] == U'柴油':
-                    return self.oil_liters() * float(self.grade_discount_type(self.grade_info[1]['DIESEL_SALE_AMOUNT']))
+                    return self.oil_liters() * Decimal(
+                        self.grade_discount_type(self.grade_info[1]['DIESEL_SALE_AMOUNT']))
 
     def get_discount_grade(self):
+        """
+        获取等级优惠
+        :return:
+        """
         min_amount = 'MIN_FUEL_AMOUNT' in self.grade_info[1] and self.grade_info[1]['MIN_FUEL_AMOUNT'] or \
                      ('MIN_CONSUME_AMOUNT' in self.grade_info[1] and self.grade_info[1]['MIN_CONSUME_AMOUNT'])
         if self.hq_func_config['NOT_BALANCE_DISCOUNT'] in (1, 0) and \
-                self.amount >= float(min_amount):
-            return float(f'{self.grade_descent_count():0.2f}')
+                self.amount >= Decimal(min_amount):
+            return Decimal(f'{self.grade_descent_count():0.2f}')
         else:
             return 0
 
     def coupon_amount(self) -> float:
+        """
+        优惠券判断计算
+        :return:
+        """
         coupon = db.select_db(False, sql=f"SELECT * FROM marketing.`coupon` WHERE BATCH_NO in (SELECT BATCH_NO FROM "
                                          f"`crm`.`member_coupon` WHERE `MEMBER_ID` = {self.member_info['MEMBER_ID']}"
                                          f" AND `STATUS` = '1' "
@@ -177,7 +192,7 @@ class Discount:
         times = Openapi().now_time().split(' ')[1]
         wday, mday = Openapi().now_time(False)
         for i in coupon_copy:
-            if self.amount < float(i['MINIMUM_AMOUNT']):
+            if self.amount < Decimal(i['MINIMUM_AMOUNT']):
                 coupon.remove(i)
                 continue
             if i['IS_ALL_STATIONS'] == 0:
@@ -225,6 +240,10 @@ class Discount:
             return 0
 
     def special_activity_count(self):
+        """
+        特惠活动 判断计算
+        :return:
+        """
         activity = db.select_db(False, sql="SELECT * FROM `marketing`.`activity` WHERE `TYPE` = '64' AND `STATUS` = '1'"
                                            f" and HQ_ID ={self.member_info['HQ_ID']}")
         activity_copy = list(activity)
@@ -236,7 +255,7 @@ class Discount:
                 if str(self.member_info['HQ_MEMBER_GRADE_ID']) not in i['USABLE_GRADE_IDS']:
                     activity.remove(i)
                     continue
-            if self.amount < float(i['MIN_FUEL_AMOUNT']):
+            if self.amount < Decimal(i['MIN_FUEL_AMOUNT']):
                 activity.remove(i)
                 continue
             if i['IS_ALL_STATIONS'] == 0:
@@ -266,7 +285,7 @@ class Discount:
                 if 1 not in temp:
                     activity.remove(i)
         if len(activity) <= 0:
-            return 0
+            return 1, 0
         else:
             activity_amt = 0
             # 目前因优惠互斥 存在问题  未进行判断
@@ -274,8 +293,8 @@ class Discount:
             for dis_activity in activity:
                 if dis_activity['ENJOY_MEMBER_GRADE_DIS'] == 1:
                     grade_type = 1
-                activity_amt = float(activity_amt) + float(dis_activity['CONDITION_VALUE_4'])
-            activity_amt = self.hq_func_config['SPECIAL_DISCOUNT'] in (1, 0) and float(
+                activity_amt = Decimal(activity_amt) + Decimal(dis_activity['CONDITION_VALUE_4'])
+            activity_amt = self.hq_func_config['SPECIAL_DISCOUNT'] in (1, 0) and Decimal(
                 f'{activity_amt * self.oil_liters():0.2f}') or 0
             return grade_type, activity_amt
 
@@ -294,6 +313,10 @@ class Discount:
         return flag
 
     def coupon(self):
+        """
+        获取优惠券
+        :return:
+        """
         times = Openapi().now_time().split(' ')
         wday, mday = Openapi().now_time(False)
         flag = False
@@ -319,13 +342,26 @@ class Discount:
             return 0
 
     def total_discount(self):
-        grade = float(self.get_discount_grade())
-        coupon = float(self.coupon())
+        """
+        获得总优惠
+        :return:
+        """
+        grade = Decimal(self.get_discount_grade())
+        coupon = Decimal(self.coupon())
         grade_act_type, activity_amt = self.special_activity_count()
 
         if grade_act_type == 0:
-            return (grade < activity_amt and activity_amt or grade) + coupon
+            return Decimal(f'{(grade < activity_amt and activity_amt or grade) + coupon:0.2f}')
         else:
 
-            return grade + activity_amt + coupon
+            return Decimal(f'{grade + activity_amt + coupon:0.2f}')
+
+    def pay_amount(self):
+        """
+        获得支付金额
+        :return:
+        """
+        pay = self.amount - self.total_discount()
+        return pay > 0 and pay or 0
+
 

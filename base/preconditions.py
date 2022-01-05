@@ -7,9 +7,11 @@
 @Date    ：创建时间：2021/12/17 
 """
 import queue
+from decimal import Decimal
 
 from common.db_mysql import DB_sql
 from base import yaml_handle
+from common.interface import OilServer
 
 db = DB_sql()
 
@@ -33,19 +35,20 @@ class Precondition:
         member_info.update(member)
         member_account = db.select_db(column='AMOUNT, POINT',
                                       table='crm.member_account', where=f'MEMBER_ID = {member_id}')
+        if member_account['AMOUNT'] == Decimal(0):
+            OilServer().charge(500, member_id)
+            member_account['AMOUNT'] = member_account['AMOUNT'] + Decimal(500)
         member_info.update(member_account)
         grade_type = db.select_db(column='GRADE_TYPE', table='erp_hq.member_grade_config',
                                   where=f'ID = {member["HQ_MEMBER_GRADE_ID"]}')
         member_info.update(grade_type)
         v, = grade_type.values()
-        if v != 0:
+        if v != Decimal(0):
             upgrade_value = db.select_db(column='MEMBER_UPGRADE_VALUE', table='crm.member_grade',
                                          where=f'MEMBER_ID = {member_id}')
 
             member_info.update(upgrade_value)
         return member_info
-
-    # 传参  用例数据
 
     def fp_info(self, num):
         """

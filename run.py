@@ -12,7 +12,7 @@ import time
 
 import pytest
 
-os.environ['ENV_FOR_DYNACONF'] = 'test'
 
 if __name__ == '__main__':
-    pytest.main(['-v', '-q', '-s',  '--alluredir=./result/{}'.format('json')])
+    os.environ['ENV_FOR_DYNACONF'] = 'test'
+    pytest.main(['-v', '-q', '-s', '/testcase/test_self_pay.py', '--alluredir=./result/{}'.format('json')])
