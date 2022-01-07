@@ -77,12 +77,16 @@ class Discount:
         获取油品升数
         :return:
         """
-        digit = str(Decimal(self.amount) / Decimal(self.oil["PRICE"])).split('.')[1]
-        if len(digit) >= 3:
-            lites = int((Decimal(self.amount) / Decimal(self.oil["PRICE"])) * 100 + 1) / 100
-            return Decimal(f'{lites:0.2f}')
+        if '.' in str(self.amount / float(self.oil["PRICE"])):
+            digit = str(self.amount / float(self.oil["PRICE"])).split('.')[1]
+            if len(digit) >= 3:
+                lites = int((Decimal(self.amount) / Decimal(self.oil["PRICE"])) * 100 + 1) / 100
+                return Decimal(f'{lites:0.2f}')
+            else:
+                lites = Decimal(self.amount) / Decimal(self.oil["PRICE"])
+                return Decimal(f'{lites:0.2f}')
         else:
-            lites = self.amount / Decimal(self.oil["PRICE"])
+            lites = Decimal(self.amount) / Decimal(self.oil["PRICE"])
             return Decimal(f'{lites:0.2f}')
 
     def get_grade_point(self, amount):
@@ -294,8 +298,12 @@ class Discount:
                 if dis_activity['ENJOY_MEMBER_GRADE_DIS'] == 1:
                     grade_type = 1
                 activity_amt = Decimal(activity_amt) + Decimal(dis_activity['CONDITION_VALUE_4'])
+            if  self.hq_func_config['MEMBER_GRADE_PRIVILEGE_TYPE'] == 0:
+                oil_liters = int(self.oil_liters())
+            else:
+                oil_liters = self.oil_liters()
             activity_amt = self.hq_func_config['SPECIAL_DISCOUNT'] in (1, 0) and Decimal(
-                f'{activity_amt * self.oil_liters():0.2f}') or 0
+                f'{activity_amt * oil_liters:0.2f}') or 0
             return grade_type, activity_amt
 
     @staticmethod
@@ -347,7 +355,7 @@ class Discount:
         :return:
         """
         grade = Decimal(self.get_discount_grade())
-        coupon = Decimal(self.coupon())
+        coupon = Decimal(f'{self.coupon()}')
         grade_act_type, activity_amt = self.special_activity_count()
 
         if grade_act_type == 0:

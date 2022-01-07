@@ -7,6 +7,7 @@
 @Date    ：创建时间：2021/12/17 
 """
 import queue
+import time
 from decimal import Decimal
 
 from common.db_mysql import DB_sql
@@ -49,6 +50,20 @@ class Precondition:
 
             member_info.update(upgrade_value)
         return member_info
+
+    @staticmethod
+    def self_pay_id_info(hq_id, self_pay_id):
+        table_name = db.select_db(sql=f'select table_name from data_dict.self_table_config'
+                                      f'  where FIND_IN_SET({hq_id},hq_ids)')
+
+        i = 0
+        while i <= 10:
+            info = db.select_db(sql=f'SELECT * FROM trade.2021_{table_name} where ORDER_ID ="{self_pay_id}"')
+            if info['REF_FUELLING_ORDER_ID'] not in ("", None):
+                return info
+            else:
+                time.sleep(2)
+            i += 1
 
     def fp_info(self, num):
         """
