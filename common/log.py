@@ -23,12 +23,11 @@ class Logger:
     def __init__(self):
         self.log_name = os.path.join(log_path, '{}.log'.format(time.strftime('%Y%m%d%H%M%S')))
 
-    def log_config(self, level, message, depth):
+    def log_config(self, level, message):
         """
         log 配置函数
         :param level: 等级
         :param message: 信息
-        :param depth: 函数堆栈深度
         :return:
         """
         logger = logging.getLogger(__name__)
@@ -38,7 +37,7 @@ class Logger:
         ch = logging.StreamHandler()
         ch.setLevel(logging.DEBUG)
 
-        formatter = logging.Formatter('%(asctime)s {} %(levelname)s:%(message)s'.format(self.get_func(depth)))
+        formatter = logging.Formatter('%(asctime)s {} %(levelname)s:%(message)s'.format(self.get_func()))
         fh.setFormatter(formatter)
         ch.setFormatter(formatter)
 
@@ -58,29 +57,31 @@ class Logger:
 
         fh.close()
 
-    def get_func(self, depth: int):
+    def get_func(self):
         """
         获取堆栈深度
-        :param depth: 深度
+
         :return:
         """
+        # 深度
+        depth = len(inspect.stack())
         # 封装 传入对应函数 行数
-        func = inspect.stack()[depth][3]
+        func = inspect.stack()[depth-2][3]
         if func in ['<module>', 'info', 'warning', 'error']:
             func = ''
-        line = inspect.stack()[depth][-4]
-        filename = inspect.stack()[depth][-5].split('\\')[-1]
+        line = inspect.stack()[depth-1][-4]
+        filename = inspect.stack()[depth-1][-5].split('\\')[-1]
         self.func = filename + " " + func + " " + str(line)
         return self.func
 
-    def debug(self, message, depth=3):
-        self.log_config('debug', message, depth)
+    def debug(self, message, ):
+        self.log_config('debug', message)
 
-    def info(self, message, depth=3):
-        self.log_config('info', message, depth)
+    def info(self, message):
+        self.log_config('info', message)
 
-    def warning(self, message, depth=3):
-        self.log_config('warning', message, depth)
+    def warning(self, message):
+        self.log_config('warning', message)
 
-    def error(self, message, depth=3):
-        self.log_config('error', message, depth)
+    def error(self, message):
+        self.log_config('error', message)

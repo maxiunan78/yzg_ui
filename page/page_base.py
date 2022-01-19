@@ -11,7 +11,7 @@ import time
 
 import allure
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver import Keys
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 
@@ -90,7 +90,7 @@ class Base(object):
             element = self.browser.find_element(by, value)
             return element
         except Exception as msg:
-            logger.error(U'页面元素不存在或不可见, {}'.format(msg), 5)
+            logger.error(U'页面元素不存在或不可见, {}'.format(msg))
 
     def find_elements(self, locator, visibility=True, timeout=5):
         """
@@ -112,7 +112,7 @@ class Base(object):
             elements = self.browser.find_elements(by, value)
             return elements
         except Exception as msg:
-            logger.error(U'页面元素不存在或不可见, {}'.format(msg), 5)
+            logger.error(U'页面元素不存在或不可见, {}'.format(msg))
 
     def is_visibility(self, locator) -> bool:
         """
@@ -228,7 +228,7 @@ class Base(object):
             element = self.find_element(locator, visibility=False)
             self.browser.execute_script("arguments[0].scrollIntoView();", element)
         except Exception as msg:
-            logger.error(U'滚动页面失败, {}'.format(msg), 5)
+            logger.error(U'滚动页面失败, {}'.format(msg))
 
     def page_title(self) -> str:
         """
@@ -244,7 +244,7 @@ class Base(object):
             time.sleep(0.5)
             return file_name
         except Exception as e:
-            logger.error(U'截图失败, {}'.format(e), 5)
+            logger.error(U'截图失败, {}'.format(e))
 
     def fail_picture(self, name=''):
         f = self.get_screenshot(name)

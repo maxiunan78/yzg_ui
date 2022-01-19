@@ -51,6 +51,7 @@ self_pay_params = {
 
 }
 self_pay_url = request.post_parms(url, self_pay_params, self_pay_path)
+print(self_pay_url)
 chrome.get(self_pay_url)
 WebDriverWait(chrome.get(self_pay_url), 2, 0.5)
 time.sleep(0.5)

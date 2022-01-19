@@ -80,13 +80,13 @@ cookies_info = [
 url = 'https://wx.test.youzhanguanjia.com'
 # 个人中心验证
 path = 'web/indexV9.2.html?version=V9.2#/centerIndex'
-# new_path = '/portal/member/centerIndex?version=V9.2'
+new_path = '/portal/member/centerIndex?version=V9.2'
 params = {
 
     'hqId': '16548',
-    'stationId': '165481005',
-    'hasWXPay': '1',
-    'isMember': '1',
+    # 'stationId': '165481041',
+    # 'hasWXPay': '1',
+    # 'isMember': '1',
     'openId': 'o3Uia0XxRtKiO4g-3ryMKI1r4NIA',
     'memberId': '123466864'
 
@@ -98,12 +98,26 @@ center_url = request.post_parms(url, params, path)
 
 print(center_url)
 chrome.delete_all_cookies()
-chrome.get(url)
+# chrome.get(url)
+chrome.get(center_url)
 time.sleep(0.5)
 for cookie in cookies_info:
     chrome.add_cookie(cookie)
 
+
+print(chrome.get_cookies())
+center_url = request.post_parms(url, "", new_path)
+print(chrome.get_cookies())
 chrome.get(center_url)
 
-time.sleep(2)
-chrome.quit()
+while chrome.find_element(By.XPATH,'//*[@id="list_loading"]').is_displayed():
+    time.sleep(0.5)
+# WebDriverWait(chrome, 2, 0.5).until(
+#     EC.visibility_of_element_located((By.XPATH, '//*[@id="list_loading"]/div[2]')))
+WebDriverWait(chrome, 2, 0.5).until(
+    EC.visibility_of_element_located((By.XPATH, '//*[@class="weui-grid consumeRecordPage"]')))
+chrome.find_element(By.XPATH, '//*[@class="weui-grid consumeRecordPage"]').click()
+time.sleep(0.5)
+# chrome.quit()
+# weui-grid consumeRecordPage
+# /html/body/div/header/section/div/a[1]

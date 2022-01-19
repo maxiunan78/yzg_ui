@@ -12,6 +12,7 @@ import allure
 import pytest
 
 from base import yaml_handle, discount_rule
+from base.preconditions import Precondition
 from common import custom,interface
 from common.log import Logger
 from page.center import Center
@@ -24,7 +25,7 @@ log = Logger()
 @allure.title(U'微信自助买单')
 @allure.feature(U'微信自助买单')
 @allure.description(U'测试微信自助买单功能')
-@pytest.mark.parametrize('case', [yaml_handle.case_data], ids=[f'FR_NO:{yaml_handle.case_data[U"油枪选择"]}'
+@pytest.mark.parametrize('case', [yaml_handle.case_data], ids=[f'FR_NO:{yaml_handle.case_data[U"油枪选择"]} '
                                                                f'AMOUNT:{yaml_handle.case_data[U"金额"]}'])
 class TestSelfPay:
     tmp = {}
@@ -124,7 +125,12 @@ class TestSelfPay:
                 TestSelfPay.tmp.update({U'成长值': upgrade})
             oil_liter = dis_rule.oil_liters()
             print(oil_liter)
+            print(TestSelfPay.tmp)
             assert pay_amt == float(self_pay.get_text(('xpath', self_pay.Element[U'支付金额'])))
             assert str(oil_liter)+'升' == self_pay.pay_oil_info()[U'升数']
-            print(TestSelfPay.tmp)
+
+
+    def test_center(self,member_info, center, case):
+        with allure.step(U'个人中心信息对比'):
+            assert Precondition.self_pay_id_info(member_info['HQ_ID'], TestSelfPay.tmp[U'订单ID']) is not None
 
