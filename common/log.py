@@ -21,7 +21,7 @@ class Logger:
     func = None
 
     def __init__(self):
-        self.log_name = os.path.join(log_path, '{}.log'.format(time.strftime('%Y%m%d%H%M%S')))
+        self.log_name = os.path.join(log_path, 'uiauto_{}.log'.format(time.strftime('%Y%m%d')))
 
     def log_config(self, level, message):
         """
@@ -37,7 +37,7 @@ class Logger:
         ch = logging.StreamHandler()
         ch.setLevel(logging.DEBUG)
 
-        formatter = logging.Formatter('%(asctime)s {} %(levelname)s:%(message)s'.format(self.get_func()))
+        formatter = logging.Formatter('%(asctime)s {} %(levelname)s: %(message)s'.format(self.get_func()))
         fh.setFormatter(formatter)
         ch.setFormatter(formatter)
 
