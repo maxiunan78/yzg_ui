@@ -14,4 +14,3 @@ settings = Dynaconf(
     environments=True)
 
 
-os.environ['ENV_FOR_DYNACONF'] = 'test'

@@ -37,7 +37,8 @@ class Logger:
         ch = logging.StreamHandler()
         ch.setLevel(logging.DEBUG)
 
-        formatter = logging.Formatter('%(asctime)s {} %(levelname)s: %(message)s'.format(self.get_func()))
+        formatter = logging.Formatter('%(asctime)s {} %(levelname)s: %(message)s'.format(self.get_func()),
+                                      datefmt='%Y-%m-%d %H:%M:%S')
         fh.setFormatter(formatter)
         ch.setFormatter(formatter)
 
@@ -64,7 +65,7 @@ class Logger:
         :return:
         """
         # 深度
-        depth = len(inspect.stack())
+        depth = len(inspect.stack())-30
         # 封装 传入对应函数 行数
         func = inspect.stack()[depth-2][3]
         if func in ['<module>', 'info', 'warning', 'error']:

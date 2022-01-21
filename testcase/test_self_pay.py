@@ -130,7 +130,7 @@ class TestSelfPay:
             assert str(oil_liter)+'升' == self_pay.pay_oil_info()[U'升数']
 
 
-    def test_center(self,member_info, center, case):
-        with allure.step(U'个人中心信息对比'):
-            assert Precondition.self_pay_id_info(member_info['HQ_ID'], TestSelfPay.tmp[U'订单ID']) is not None
+    # def test_center(self,member_info, center, case):
+    #     with allure.step(U'个人中心信息对比'):
+    #         assert Precondition.self_pay_id_info(member_info['HQ_ID'], TestSelfPay.tmp[U'订单ID']) is not None
 

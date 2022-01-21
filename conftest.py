@@ -62,7 +62,8 @@ def pytest_runtest_makereport():
         # else:
         #     extra = ""
         #     f.write(rep.nodeid + extra + "\n")
-        _fail_picture(rep.nodeid.split('::')[-1])
+
+        _fail_picture(rep.nodeid.split('::')[-1].split('[')[0])
 
 
 @pytest.fixture(scope='class')

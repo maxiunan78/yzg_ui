@@ -1,6 +1,6 @@
 # 自助买单
 油枪选择: 1
-金额: 58
+金额: 85.58
 '优惠设置':
   -  'canUseCashCoupon:1':   #'使用余额支付时可以使用加油代金券'
       canUseCashCoupon: 1
