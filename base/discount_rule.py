@@ -369,7 +369,7 @@ class Discount:
         获得支付金额
         :return:
         """
-        pay = self.amount - self.total_discount()
+        pay = self.amount - float(self.total_discount())
         return pay > 0 and pay or 0
 
 
