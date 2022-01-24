@@ -6,6 +6,7 @@
 @Author  ：穆崧
 @Date    ：创建时间：2021/12/6 
 """
+import re
 
 import pytest
 from base import driver
@@ -62,8 +63,8 @@ def pytest_runtest_makereport():
         # else:
         #     extra = ""
         #     f.write(rep.nodeid + extra + "\n")
-
-        _fail_picture(rep.nodeid.split('::')[-1].split('[')[0])
+        title = re.sub(r'\[(.+?)\]', '', rep.nodeid.split('::')[-1])
+        _fail_picture(title)
 
 
 @pytest.fixture(scope='class')
