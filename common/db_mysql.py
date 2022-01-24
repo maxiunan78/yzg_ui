@@ -22,13 +22,13 @@ logger = log.Logger()
 class DB_sql:
     def __init__(self):
         """连接"""
-        self.db = PooledDB(creator=pymysql, mincached=1, maxcached=10,maxconnections=10,
+        self.db = PooledDB(creator=pymysql, mincached=0, maxcached=10, maxconnections=10,
                            host=host,
                            port=port,
                            user=user,
                            password=password, charset="utf8").connection()
         # 使用cursors 游标以字典的形式读取
-        self.cur = self.db.cursor(cursor=pymysql.cursors.DictCursor)
+        self.cur = self.db.cursor()
 
     def __del__(self):
         """ 关闭数据库 """
@@ -67,7 +67,7 @@ class DB_sql:
                 data = self.cur.fetchall()
                 return data
         except Exception as e:
-            logger.error("操作MySQL出现错误，错误原因：{}".format(e), 5)
+            logger.error("操作MySQL出现错误，错误原因：{}".format(e))
 
     def execute_db(self, sql):
         """更新、删除等操作"""
@@ -76,5 +76,5 @@ class DB_sql:
             self.cur.execute(sql)
             self.db.commit()
         except Exception as e:
-            logger.error(U'操作MySQL出现错误，错误原因：{}'.format(e), 5)
+            logger.error(U'操作MySQL出现错误，错误原因：{}'.format(e))
             self.db.rollback()
