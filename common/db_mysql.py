@@ -28,7 +28,7 @@ class DB_sql:
                            user=user,
                            password=password, charset="utf8").connection()
         # 使用cursors 游标以字典的形式读取
-        self.cur = self.db.cursor()
+        self.cur = self.db.cursor(cursor=pymysql.cursors.DictCursor)
 
     def __del__(self):
         """ 关闭数据库 """

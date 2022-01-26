@@ -10,12 +10,13 @@ import queue
 import time
 from decimal import Decimal
 
+from common import log
 from common.db_mysql import DB_sql
 from base import yaml_handle
 from common.interface import OilServer
 
 db = DB_sql()
-
+logger = log.Logger()
 
 class Precondition:
     # 会员信息  积分，优惠，成长值规则 站点油品油枪 条件通过读取配置判断
@@ -32,24 +33,27 @@ class Precondition:
         """
         member_info = {}
         member = db.select_db(column='HQ_MEMBER_GRADE_ID,HQ_ID,MEMBER_ID,MEMBER_NAME,PHONE_NUM,HQ_MEMBER_GRADE_NAME',
-                              table='crm.member', where=f'MEMBER_ID = {member_id}')
-        member_info.update(member)
-        member_account = db.select_db(column='AMOUNT, POINT',
-                                      table='crm.member_account', where=f'MEMBER_ID = {member_id}')
-        if member_account['AMOUNT'] == Decimal(0):
-            OilServer().charge(500, member_id)
-            member_account['AMOUNT'] = member_account['AMOUNT'] + Decimal(500)
-        member_info.update(member_account)
-        grade_type = db.select_db(column='GRADE_TYPE', table='erp_hq.member_grade_config',
-                                  where=f'ID = {member["HQ_MEMBER_GRADE_ID"]}')
-        member_info.update(grade_type)
-        v, = grade_type.values()
-        if v != Decimal(0):
-            upgrade_value = db.select_db(column='MEMBER_UPGRADE_VALUE', table='crm.member_grade',
-                                         where=f'MEMBER_ID = {member_id}')
+                              table='crm.member', where=f'MEMBER_ID = {member_id} and STATUS = 1')
+        if not member:
+            logger.error(U'会员已注销')
+        else:
+            member_info.update(member)
+            member_account = db.select_db(column='AMOUNT, POINT',
+                                          table='crm.member_account', where=f'MEMBER_ID = {member_id}')
+            if member_account['AMOUNT'] == Decimal(0):
+                OilServer().charge(500, member_id)
+                member_account['AMOUNT'] = member_account['AMOUNT'] + Decimal(500)
+            member_info.update(member_account)
+            grade_type = db.select_db(column='GRADE_TYPE', table='erp_hq.member_grade_config',
+                                      where=f'ID = {member["HQ_MEMBER_GRADE_ID"]}')
+            member_info.update(grade_type)
+            v, = grade_type.values()
+            if v != Decimal(0):
+                upgrade_value = db.select_db(column='MEMBER_UPGRADE_VALUE', table='crm.member_grade',
+                                             where=f'MEMBER_ID = {member_id}')
 
-            member_info.update(upgrade_value)
-        return member_info
+                member_info.update(upgrade_value)
+            return member_info
 
     @staticmethod
     def self_pay_id_info(hq_id, self_pay_id):
