@@ -298,7 +298,7 @@ class Discount:
                 if dis_activity['ENJOY_MEMBER_GRADE_DIS'] == 1:
                     grade_type = 1
                 activity_amt = Decimal(activity_amt) + Decimal(dis_activity['CONDITION_VALUE_4'])
-            if  self.hq_func_config['MEMBER_GRADE_PRIVILEGE_TYPE'] == 0:
+            if self.hq_func_config['MEMBER_GRADE_PRIVILEGE_TYPE'] == 0:
                 oil_liters = int(self.oil_liters())
             else:
                 oil_liters = self.oil_liters()
@@ -364,12 +364,20 @@ class Discount:
 
             return Decimal(f'{grade + activity_amt + coupon:0.2f}')
 
+    def actual_discount(self):
+        """
+        获得实际优惠
+        :return:
+        """
+        if self.amount >= float(self.total_discount()):
+            return self.total_discount()
+        else:
+            return self.amount
+
     def pay_amount(self):
         """
         获得支付金额
         :return:
         """
-        pay = self.amount - float(self.total_discount())
-        return pay > 0 and pay or 0
-
-
+        pay = self.amount - float(self.actual_discount())
+        return pay

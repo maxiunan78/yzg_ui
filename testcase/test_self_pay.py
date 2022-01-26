@@ -109,7 +109,7 @@ class TestSelfPay:
             dis_rule = discount_rule.Discount(case[U'油枪选择'], case[U'金额'])
             discount = float(self_pay.get_text(('xpath', self_pay.Element[U'优惠金额'])))
             TestSelfPay.tmp.update({U'优惠金额': discount})
-            assert discount == float(dis_rule.total_discount()), log.error(U'优惠金额错误')
+            assert discount == float(dis_rule.actual_discount()), log.error(U'优惠金额错误')
             pay_amt = float(self_pay.get_text(('xpath', self_pay.Element[U'待支付金额'])))
             TestSelfPay.tmp.update({U'支付金额': pay_amt})
             assert pay_amt == float(dis_rule.pay_amount()), log.error(U'支付金额错误')
