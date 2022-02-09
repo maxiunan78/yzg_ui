@@ -66,7 +66,7 @@ class DB_sql:
                 data = self.cur.fetchall()
                 return data
         except Exception as e:
-            raise Exception("操作MySQL出现错误，错误原因：{}".format(e))
+            raise e
 
     def execute_db(self, sql):
         """更新、删除等操作"""
@@ -76,5 +76,5 @@ class DB_sql:
             self.db.commit()
         except Exception as e:
             self.db.rollback()
-            raise Exception(U'操作MySQL出现错误，错误原因：{}'.format(e))
+            raise e
 
