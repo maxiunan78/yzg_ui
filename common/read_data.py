@@ -8,26 +8,26 @@
 """
 import os
 
-import yaml
+from ruamel.yaml import YAML
 
 from common import log
 from config.config import settings
 
 logger = log.Logger()
-
+yaml = YAML()
 base_path = os.path.dirname(os.path.dirname(__file__))
 data_list = os.path.join(base_path, 'data')
 
 
 def load_yaml(file):
     with open(file, encoding='UTF_8') as f:
-        data = yaml.safe_load(f)
+        data = yaml.load(f)
     return data
 
 
 def dump_yaml(data, file):
     with open(file, "w+", encoding='UTF_8') as f:
-        yaml.safe_dump(data, f)
+        yaml.dump(data, f)
     return file
 
 
