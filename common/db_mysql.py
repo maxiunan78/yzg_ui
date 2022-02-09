@@ -10,13 +10,12 @@ import pymysql
 from dbutils.pooled_db import PooledDB
 
 from config.config import settings
-from common import log
+
 
 host = settings.database['host']
 port = settings.database['port']
 user = settings.database['user']
 password = settings.database['password']
-logger = log.Logger()
 
 
 class DB_sql:
@@ -67,7 +66,7 @@ class DB_sql:
                 data = self.cur.fetchall()
                 return data
         except Exception as e:
-            logger.error("操作MySQL出现错误，错误原因：{}".format(e))
+            raise Exception("操作MySQL出现错误，错误原因：{}".format(e))
 
     def execute_db(self, sql):
         """更新、删除等操作"""
@@ -76,5 +75,6 @@ class DB_sql:
             self.cur.execute(sql)
             self.db.commit()
         except Exception as e:
-            logger.error(U'操作MySQL出现错误，错误原因：{}'.format(e))
             self.db.rollback()
+            raise Exception(U'操作MySQL出现错误，错误原因：{}'.format(e))
+
