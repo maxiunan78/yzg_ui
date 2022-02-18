@@ -81,6 +81,7 @@ class Discount:
             digit = str(self.amount / float(self.oil["PRICE"])).split('.')[1]
             if len(digit) >= 3:
                 lites = int((Decimal(self.amount) / Decimal(self.oil["PRICE"])) * 100 + 1) / 100
+                print(Decimal(f'{lites:0.2f}'))
                 return Decimal(f'{lites:0.2f}')
             else:
                 lites = Decimal(self.amount) / Decimal(self.oil["PRICE"])
@@ -369,7 +370,7 @@ class Discount:
         获得实际优惠
         :return:
         """
-        if self.amount >= float(self.total_discount()):
+        if self.amount >= self.total_discount():
             return self.total_discount()
         else:
             return self.amount
@@ -379,5 +380,5 @@ class Discount:
         获得支付金额
         :return:
         """
-        pay = self.amount - float(self.actual_discount())
+        pay = self.amount - self.actual_discount()
         return pay
