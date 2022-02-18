@@ -16,7 +16,6 @@ from base import yaml_handle
 from common.interface import OilServer
 
 db = DB_sql()
-logger = log.Logger()
 
 class Precondition:
     # 会员信息  积分，优惠，成长值规则 站点油品油枪 条件通过读取配置判断
@@ -35,7 +34,7 @@ class Precondition:
         member = db.select_db(column='HQ_MEMBER_GRADE_ID,HQ_ID,MEMBER_ID,MEMBER_NAME,PHONE_NUM,HQ_MEMBER_GRADE_NAME',
                               table='crm.member', where=f'MEMBER_ID = {member_id} and STATUS = 1')
         if not member:
-            logger.error(U'会员已注销')
+            raise Exception(U'会员已注销')
         else:
             member_info.update(member)
             member_account = db.select_db(column='AMOUNT, POINT',

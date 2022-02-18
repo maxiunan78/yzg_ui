@@ -7,27 +7,24 @@
 @Date    ：创建时间：2021/11/29 
 """
 import os
-
-import yaml
-
-from common import log
+from ruamel.yaml import YAML
 from config.config import settings
 
-logger = log.Logger()
 
+yaml = YAML()
 base_path = os.path.dirname(os.path.dirname(__file__))
 data_list = os.path.join(base_path, 'data')
 
 
 def load_yaml(file):
     with open(file, encoding='UTF_8') as f:
-        data = yaml.safe_load(f)
+        data = yaml.load(f)
     return data
 
 
 def dump_yaml(data, file):
     with open(file, "w+", encoding='UTF_8') as f:
-        yaml.safe_dump(data, f)
+        yaml.dump(data, f)
     return file
 
 
@@ -37,7 +34,7 @@ class Data:
         element_path = os.path.join(data_list, settings.elementpath)
         case_path = os.path.join(data_list, settings.casedatapath)
         if not(os.path.exists(data_path) or os.path.exists(element_path) or os.path.exists(case_path)):
-            logger.error(U'无存放数据')
+            raise Exception(U'无存放数据')
         self.data = load_yaml(data_path)
         self.element = load_yaml(element_path)
         self.case = load_yaml(case_path)
@@ -52,7 +49,7 @@ class Data:
         file = os.path.join(data_list, filename+'.yaml')
         dump_yaml(data, file)
         if not os.path.exists(file):
-            logger.error(U'创建文件失败')
+            raise Exception(U'创建文件失败')
         self.data = load_yaml(file)
         return self.data
 
