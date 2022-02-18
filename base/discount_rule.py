@@ -81,7 +81,6 @@ class Discount:
             digit = str(self.amount / float(self.oil["PRICE"])).split('.')[1]
             if len(digit) >= 3:
                 lites = int((Decimal(self.amount) / Decimal(self.oil["PRICE"])) * 100 + 1) / 100
-                print(Decimal(f'{lites:0.2f}'))
                 return Decimal(f'{lites:0.2f}')
             else:
                 lites = Decimal(self.amount) / Decimal(self.oil["PRICE"])
