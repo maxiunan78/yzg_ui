@@ -1,0 +1,2 @@
+2021-12-22 10:37:24,251 register.py get_code 44 INFO:一分钟内不能再发送 or 发送短信达到阀值
+2021-12-22 10:37:24,264 test_register.py test_register 55 INFO:发送短信失败

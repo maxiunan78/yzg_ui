@@ -9,11 +9,14 @@
 import re
 
 import pytest
+
+from page import page_base
 from base import driver
 from base.preconditions import Precondition
-from page import page_base
+
 
 base_driver = None
+
 
 
 @pytest.fixture(scope='session')
@@ -31,7 +34,7 @@ def driver_base(request):
     def close():
         browser.quit()
 
-    request.addfinalizer(close)
+    # request.addfinalizer(close)
     return base_driver
 
 

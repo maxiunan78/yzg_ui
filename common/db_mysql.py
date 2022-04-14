@@ -32,7 +32,7 @@ class DB_sql:
     def __del__(self):
         """ 关闭数据库 """
         self.cur.close()
-        self.db.close()
+        # self.db.close()
 
     def select_db(self, single=True, **kwargs):
         """

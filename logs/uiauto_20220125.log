@@ -1,0 +1,6 @@
+2022-01-25 09:13:18,911 D:/Users/ASUS/project/yzg_ui/run.py main 18 INFO: 确认是否存在加油员
+2022-01-25 09:13:18,945 D:/Users/ASUS/project/yzg_ui/run.py main 18 INFO: 存在加油员
+2022-01-25 09:13:26,194 D:/Users/ASUS/project/yzg_ui/run.py main 18 ERROR: 支付跳转失败
+2022-01-25 09:21:06,160 D:/Users/ASUS/project/yzg_ui/run.py main 18 INFO: 确认是否存在加油员
+2022-01-25 09:21:06,208 D:/Users/ASUS/project/yzg_ui/run.py main 18 INFO: 存在加油员
+2022-01-25 09:21:13,239 D:/Users/ASUS/project/yzg_ui/run.py main 18 ERROR: 支付跳转失败

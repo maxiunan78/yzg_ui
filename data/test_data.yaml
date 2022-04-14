@@ -11,11 +11,14 @@
 
 #get url中需要的参数
 #公用参数
-"stationId": '165481041'
+"stationId": '165481001'
 'hqId': '16548'
-'openId': 'o3Uia0XxRtKiO4g-3ryMKI1r4NIA'
-'memberId': '123466864'
+'openId': 'o3Uia0TDUyJMIWkgfO0MOQk0_4FA'
+'memberId': '123466929'
 
 # self_to_pay 参数
 'sourceType': '1'
+
+#register 发送短信接口
+'code_url': 'https://wx.test.youzhanguanjia.com/third/member/getValidateCode'
 

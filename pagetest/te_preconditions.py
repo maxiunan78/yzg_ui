@@ -1,30 +1,31 @@
 #!/usr/bin/env python
+# -*- coding:utf-8 -*-
+
+# author:maxiunan
+#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 """
-@Project ：yzg_ui 
+@Project ：yzg_ui
 @File    ：te_preconditions.py
 @Author  ：穆崧
-@Date    ：创建时间：2021/12/17 
+@Date    ：创建时间：2021/12/17
 """
 import queue
-import time
-from decimal import Decimal
 
-from common import log
 from common.db_mysql import DB_sql
 from base import yaml_handle
-from common.interface import OilServer
 
 db = DB_sql()
+
 
 class Precondition:
     # 会员信息  积分，优惠，成长值规则 站点油品油枪 条件通过读取配置判断
     def __init__(self):
-        self.member_info = Precondition.get_member()
-        self.station_id = yaml_handle.param_value("stationId")
+        self.member_info = Precondition.get_member(123466929)
+        self.station_id = 165481060
 
     @staticmethod
-    def get_member(member_id=yaml_handle.param_value('memberId')):
+    def get_member(member_id):
         """
         获取会员基本信息
         :param member_id: 会员ID
@@ -32,41 +33,24 @@ class Precondition:
         """
         member_info = {}
         member = db.select_db(column='HQ_MEMBER_GRADE_ID,HQ_ID,MEMBER_ID,MEMBER_NAME,PHONE_NUM,HQ_MEMBER_GRADE_NAME',
-                              table='crm.member', where=f'MEMBER_ID = {member_id} and STATUS = 1')
-        if not member:
-            raise Exception(U'会员已注销')
-        else:
-            member_info.update(member)
-            member_account = db.select_db(column='AMOUNT, POINT',
-                                          table='crm.member_account', where=f'MEMBER_ID = {member_id}')
-            if member_account['AMOUNT'] == Decimal(0):
-                OilServer().charge(500, member_id)
-                member_account['AMOUNT'] = member_account['AMOUNT'] + Decimal(500)
-            member_info.update(member_account)
-            grade_type = db.select_db(column='GRADE_TYPE', table='erp_hq.member_grade_config',
-                                      where=f'ID = {member["HQ_MEMBER_GRADE_ID"]}')
-            member_info.update(grade_type)
-            v, = grade_type.values()
-            if v != Decimal(0):
-                upgrade_value = db.select_db(column='MEMBER_UPGRADE_VALUE', table='crm.member_grade',
-                                             where=f'MEMBER_ID = {member_id}')
+                              table='crm.member', where=f'MEMBER_ID = {member_id}')
+        # print(member)
+        member_info.update(member)
+        member_account = db.select_db(column='AMOUNT, POINT',
+                                      table='crm.member_account', where=f'MEMBER_ID = {member_id}')
+        member_info.update(member_account)
+        grade_type = db.select_db(column='GRADE_TYPE', table='erp_hq.member_grade_config',
+                                  where=f'ID = {member["HQ_MEMBER_GRADE_ID"]}')
+        member_info.update(grade_type)
+        v, = grade_type.values()
+        if v != 0:
+            upgrade_value = db.select_db(column='MEMBER_UPGRADE_VALUE', table='crm.member_grade',
+                                         where=f'MEMBER_ID = {member_id}')
 
-                member_info.update(upgrade_value)
-            return member_info
+            member_info.update(upgrade_value)
+        return member_info
 
-    @staticmethod
-    def self_pay_id_info(hq_id, self_pay_id):
-        table_name = db.select_db(sql=f'select table_name from data_dict.self_table_config'
-                                      f'  where FIND_IN_SET({hq_id},hq_ids)')
-
-        i = 0
-        while i <= 10:
-            info = db.select_db(sql=f'SELECT * FROM trade.2021_{table_name} where ORDER_ID ="{self_pay_id}"')
-            if info['REF_FUELLING_ORDER_ID'] not in ("", None):
-                return info
-            else:
-                time.sleep(2)
-            i += 1
+    # 传参  用例数据
 
     def fp_info(self, num):
         """
@@ -75,14 +59,15 @@ class Precondition:
         :return: 油枪信息 （油枪号，价格，油品名称）
         """
         fp = db.select_db(column='FP_NO,PR_NAME,PRICE', table='erp_station.fp_monitor_history',
-                          where=f'STATION_ID = {self.station_id} and FP_NO = {num}')
+                          where=f'STATION_ID =165481060  and FP_NO = {num}')
         return fp
 
-    def grade_config(self, fp_name: str):
+    def grade_config(self, fp_no):
         """
         获取 等级优惠 积分 成长值 基本信息
         :return: 等级优惠 积分 成长值 基本信息
         """
+
         grade_id = self.member_info['HQ_MEMBER_GRADE_ID']
         grade_type = self.member_info['GRADE_TYPE']
         hq_id = self.member_info['HQ_ID']
@@ -96,10 +81,10 @@ class Precondition:
                                              'discount.REF_CONFIG_ID = station.ID '
                                              ') AS discount ON advanced.REF_ID = discount.ID ',
                                         where=f'GRADE_ID = {grade_id} '
-                                              f'AND PR_NAME = "{fp_name}" '
+                                              f'AND PR_NAME = "93#汽油" '
                                               f'AND FIND_IN_SET({station_id},USABLE_STATION_IDS)'
                                               f'AND advanced.HQ_ID = {hq_id}')
-
+        # print(station_adv_task)
         station_task = db.select_db(
             column='discount.GAS_POINT,discount.SALE_AMOUNT,discount.DIESEL_POINT,'
                    'discount.DIESEL_SALE_AMOUNT,discount.DISCOUNT_TYPE,discount.MIN_FUEL_AMOUNT',
@@ -108,16 +93,18 @@ class Precondition:
             where=f' GRADE_ID = {grade_id} '
                   f'AND FIND_IN_SET({station_id},USABLE_STATION_IDS)'
                   f'AND discount.HQ_ID = {hq_id}')
+        print(station_task)
         grade_adv_task = db.select_db(
             column='SALE_AMOUNT,POINT',
             table='erp_hq.grade_pr_advanced_config',
-            where=f'GRADE_ID = {grade_id} and HQ_ID={hq_id} and PR_NAME = {fp_name}'
+            where=f'GRADE_ID = {grade_id} and HQ_ID = {hq_id} and PR_NAME = 93#汽油'
         )
-
+        # print(grade_adv_task)
         grade_task = db.select_db(column='SALE_AMOUNT,DIESEL_SALE_AMOUNT,POINT,DIESEL_POINT,DISCOUNT_TYPE,GAS_UPGRADE,'
-                                         'DIESEL_UPGRADE,MIN_CONSUME_AMOUNT',
+                                         'DIESEL_UPGRADE',
                                   table='erp_hq.member_grade_config',
-                                  where=f'ID = {grade_id} and HQ_ID={hq_id} ')
+                                  where=f'ID = {grade_id} and HQ_ID = {hq_id} ')
+        # print(grade_task)
         qp = queue.PriorityQueue()
         if grade_type == 0:
             qp.put((1, station_adv_task))
@@ -125,6 +112,7 @@ class Precondition:
             qp.put((3, grade_adv_task))
             grade_task.pop('GAS_UPGRADE', 'DIESEL_UPGRADE')
             qp.put((4, grade_task))
+            # print(qp)
             while not qp.empty():
                 member_grade = qp.get()
                 priority, value = member_grade
@@ -132,6 +120,7 @@ class Precondition:
                     member_grade[1].update({'DISCOUNT_TYPE': station_task['DISCOUNT_TYPE'],
                                             'MIN_FUEL_AMOUNT': station_task['MIN_FUEL_AMOUNT']
                                             })
+                    print(member_grade)
                     return member_grade
                 elif value is not None and priority in (3, 4):
                     member_grade[1].update({'DISCOUNT_TYPE': grade_task['DISCOUNT_TYPE'],
@@ -152,20 +141,17 @@ class Precondition:
                     grade_adv_task_copy = grade_adv_task.copy()
                     grade_adv_task_copy.pop('POINT')
                     qp.put((3, grade_adv_task_copy))
+                # print(qp)
                 grade_task_copy = grade_task.copy()
                 [grade_task_copy.pop(k) for k in
-                 ['GAS_UPGRADE', 'DIESEL_UPGRADE', 'POINT', 'DIESEL_POINT']]
+                 ['GAS_UPGRADE', 'DIESEL_UPGRADE', 'POINT', 'DISCOUNT_TYPE', 'DIESEL_POINT']]
                 qp.put((4, grade_task_copy))
                 while not qp.empty():
                     member_grade_discount = qp.get()
                     dis_priority, dis_value = member_grade_discount
-                    if dis_value is not None and dis_priority in (1, 2):
+                    if dis_value is not None:
                         qp.queue.clear()
-                        member_grade_discount[1].update({'DISCOUNT_TYPE': station_task['DISCOUNT_TYPE']})
-                        return member_grade_discount
-                    elif dis_value is not None and dis_priority in (3, 4):
-                        qp.queue.clear()
-                        member_grade_discount[1].update({'DISCOUNT_TYPE': grade_task['DISCOUNT_TYPE']})
+                        print(member_grade_discount)
                         return member_grade_discount
 
             def grade_point():
@@ -188,6 +174,7 @@ class Precondition:
                     point_priority, point_value = member_grade_point
                     if point_value is not None:
                         qp.queue.clear()
+                        print(point_value)
                         return point_value
 
             member_grade = grade_discount()
@@ -195,4 +182,12 @@ class Precondition:
             member_grade[1].update(grade_point())
             member_grade[1].update(
                 {'GAS_UPGRADE': grade_task['GAS_UPGRADE'], 'DIESEL_UPGRADE': grade_task['DIESEL_UPGRADE']})
+            print(member_grade)
             return member_grade
+
+if __name__ == "__main__":
+    Pr = Precondition()
+    member_info = Precondition.get_member(123466929)
+    print(member_info)
+    print(Pr.fp_info(1))
+    Pr.grade_config(1)

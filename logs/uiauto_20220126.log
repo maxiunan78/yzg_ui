@@ -1,0 +1,11 @@
+2022-01-26 09:05:16,477 D:/Users/ASUS/project/yzg_ui/run.py main 18 INFO: 确认是否存在加油员
+2022-01-26 09:05:16,513 D:/Users/ASUS/project/yzg_ui/run.py main 18 INFO: 存在加油员
+2022-01-26 09:05:22,338 D:/Users/ASUS/project/yzg_ui/run.py main 18 ERROR: 优惠金额错误
+2022-01-26 09:11:51,397 pydevd.py main 2173 INFO: 确认是否存在加油员
+2022-01-26 09:11:51,451 pydevd.py main 2173 INFO: 存在加油员
+2022-01-26 10:07:44,169 D:/Users/ASUS/project/yzg_ui/run.py main 18 INFO: 确认是否存在加油员
+2022-01-26 10:07:44,209 D:/Users/ASUS/project/yzg_ui/run.py main 18 INFO: 存在加油员
+2022-01-26 10:07:49,110 D:/Users/ASUS/project/yzg_ui/run.py main 18 ERROR: 优惠金额错误
+2022-01-26 10:12:49,223 pydevd.py main 2173 INFO: 确认是否存在加油员
+2022-01-26 10:12:49,315 pydevd.py main 2173 INFO: 存在加油员
+2022-01-26 10:32:37,965 pydevd.py main 2173 ERROR: 优惠金额错误

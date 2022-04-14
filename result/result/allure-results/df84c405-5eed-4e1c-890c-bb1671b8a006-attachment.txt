@@ -1,0 +1,2 @@
+INFO     common.log:log.py:49 确认是否存在加油员
+INFO     common.log:log.py:49 存在加油员
