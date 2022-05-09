@@ -34,7 +34,7 @@ def driver_base(request):
     def close():
         browser.quit()
 
-    # request.addfinalizer(close)
+    request.addfinalizer(close)
     return base_driver
 
 
